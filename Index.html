@@ -1,0 +1,2417 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Jejak Laut — Manajemen Rantai Dingin Hasil Laut</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#0B1F2A;
+    --bg:#EFF4F4;
+    --surface:#FFFFFF;
+    --surface-2:#E6EDED;
+    --border:#D2DCDC;
+    --muted:#546A6E;
+    --accent:#166E7E;
+    --accent-ink:#0B4956;
+    --accent-soft:#DCEDEF;
+    --amber:#B9711F;
+    --amber-soft:#F6E7D3;
+    --green:#227A50;
+    --green-soft:#DBEEE2;
+    --red:#B03A2E;
+    --red-soft:#F6DFDA;
+    --blue:#2F5F8A;
+    --blue-soft:#DEE9F3;
+    --grey-soft:#E4E8E9;
+    --grey-ink:#4B5B5E;
+    --font-ui:'Space Grotesk','Segoe UI',system-ui,-apple-system,sans-serif;
+    --font-mono:'IBM Plex Mono','SFMono-Regular',Consolas,monospace;
+    --radius:6px;
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --ink:#E7F0F0;
+      --bg:#0A1A20;
+      --surface:#0F262D;
+      --surface-2:#143039;
+      --border:#204049;
+      --muted:#8FA8AB;
+      --accent:#4FB6C7;
+      --accent-ink:#BEEAF0;
+      --accent-soft:#123B44;
+      --amber:#E3A45C;
+      --amber-soft:#3A2C14;
+      --green:#5FBF8E;
+      --green-soft:#123526;
+      --red:#E0776A;
+      --red-soft:#3A1D18;
+      --blue:#7FAAD6;
+      --blue-soft:#152C40;
+      --grey-soft:#1B3038;
+      --grey-ink:#9FB4B7;
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"]{
+    --ink:#E7F0F0;
+    --bg:#0A1A20;
+    --surface:#0F262D;
+    --surface-2:#143039;
+    --border:#204049;
+    --muted:#8FA8AB;
+    --accent:#4FB6C7;
+    --accent-ink:#BEEAF0;
+    --accent-soft:#123B44;
+    --amber:#E3A45C;
+    --amber-soft:#3A2C14;
+    --green:#5FBF8E;
+    --green-soft:#123526;
+    --red:#E0776A;
+    --red-soft:#3A1D18;
+    --blue:#7FAAD6;
+    --blue-soft:#152C40;
+    --grey-soft:#1B3038;
+    --grey-ink:#9FB4B7;
+    color-scheme: dark;
+  }
+  *,*::before,*::after{ box-sizing:border-box; }
+  html{ scroll-padding-top: env(safe-area-inset-top,0px); }
+  html,body{ height:100%; }
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--ink);
+    font-family:var(--font-ui);
+    font-size:14.5px;
+    line-height:1.5;
+    padding-top:env(safe-area-inset-top,0px);
+    padding-bottom:env(safe-area-inset-bottom,0px);
+  }
+  @media (prefers-reduced-motion: reduce){
+    *{ animation-duration:0.001ms !important; transition-duration:0.001ms !important; }
+  }
+  a{ color:inherit; }
+  button{ font-family:inherit; }
+  :focus-visible{ outline:2px solid var(--accent); outline-offset:2px; border-radius:2px; }
+
+  #app{ display:flex; min-height:100%; }
+
+  /* ---------- Sidebar (fixed dark chrome, brand identity) ---------- */
+  .sidebar{
+    width:246px; flex:none;
+    background:#0B1F2A;
+    color:#DCEAEA;
+    display:flex; flex-direction:column;
+    border-right:1px solid #143039;
+    position:sticky; top:0; height:100vh;
+    padding-top:env(safe-area-inset-top,0px);
+  }
+  .brand{
+    display:flex; align-items:center; gap:10px;
+    padding:20px 18px 16px;
+    border-bottom:1px solid #143039;
+  }
+  .brand-mark{
+    width:34px; height:34px; border-radius:8px;
+    background:linear-gradient(160deg,#1B7A8C,#0B4956);
+    display:flex; align-items:center; justify-content:center;
+    flex:none;
+  }
+  .brand-name{ font-weight:700; font-size:16px; letter-spacing:0.2px; color:#F2F8F8; line-height:1.15; }
+  .brand-sub{ font-size:10.5px; color:#7FA0A5; margin-top:2px; }
+
+  .nav-scroll{ flex:1; overflow-y:auto; padding:14px 10px 10px; }
+  .nav-group-label{ font-size:11px; color:#5F8489; padding:12px 10px 6px; }
+  .nav-group-label:first-child{ padding-top:2px; }
+  .nav-item{
+    display:flex; align-items:center; gap:10px;
+    padding:9px 10px; border-radius:6px; color:#BFD6D8;
+    text-decoration:none; cursor:pointer; font-size:13.5px;
+    border:1px solid transparent; background:none; width:100%; text-align:left;
+  }
+  .nav-item svg{ width:17px; height:17px; flex:none; opacity:0.85; }
+  .nav-item:hover{ background:#122A32; color:#EAF5F5; }
+  .nav-item.active{ background:#123B44; color:#8FE0EC; border-color:#1B5A66; }
+  .nav-item.active svg{ opacity:1; }
+
+  .sidebar-foot{
+    border-top:1px solid #143039; padding:12px 16px 16px;
+    font-size:11px; color:#5F8489;
+    padding-bottom:calc(16px + env(safe-area-inset-bottom,0px));
+  }
+  .sidebar-foot b{ color:#9FC3C7; font-weight:600; }
+  .sidebar-user-name{ color:#EAF5F5; font-weight:600; font-size:12.5px; }
+  .sidebar-user-role{ color:#7FA0A5; font-size:11px; margin-top:1px; }
+
+  .sidebar-close{ display:none; }
+
+  /* ---------- Auth screen ---------- */
+  .auth-wrap{
+    width:100%; min-height:100vh; min-height:100dvh; display:flex; align-items:center; justify-content:center;
+    background:var(--bg); padding:24px; padding-top:calc(24px + env(safe-area-inset-top,0px)); padding-bottom:calc(24px + env(safe-area-inset-bottom,0px));
+  }
+  .auth-card{
+    width:100%; max-width:380px; background:var(--surface); border:1px solid var(--border);
+    border-radius:10px; padding:26px 26px 22px; box-shadow:0 10px 34px rgba(11,31,42,0.08);
+  }
+  .auth-brand{ display:flex; align-items:center; gap:10px; }
+  .auth-sub{ font-size:11px; color:var(--muted); margin-top:2px; }
+  .auth-head-row{ margin-top:16px; display:flex; align-items:center; justify-content:space-between; }
+  .auth-form{ margin-top:16px; display:flex; flex-direction:column; gap:12px; }
+  .auth-error{
+    background:var(--red-soft); color:var(--red); border-radius:6px; padding:8px 10px;
+    font-size:12.5px; margin-top:12px;
+  }
+  .auth-notice{
+    background:var(--accent-soft, #E7F1F1); color:var(--accent); border-radius:6px; padding:8px 10px;
+    font-size:12.5px; margin-top:12px;
+  }
+  .auth-foot{ margin-top:16px; padding-top:14px; border-top:1px solid var(--border); text-align:center; }
+
+  /* ---------- Main column ---------- */
+  .main-col{ flex:1; min-width:0; display:flex; flex-direction:column; }
+  .topbar{
+    position:sticky; top:0; z-index:20;
+    display:flex; align-items:center; gap:14px;
+    padding:14px 22px; padding-top:calc(14px + env(safe-area-inset-top,0px));
+    background:var(--bg); border-bottom:1px solid var(--border);
+  }
+  .hamburger{
+    display:none; border:1px solid var(--border); background:var(--surface);
+    width:36px; height:36px; border-radius:6px; align-items:center; justify-content:center; cursor:pointer;
+  }
+  .hamburger svg{ width:18px; height:18px; }
+  .topbar-titles{ flex:1; min-width:0; }
+  .topbar-title{ font-size:19px; font-weight:600; margin:0; }
+  .topbar-desc{ font-size:12.5px; color:var(--muted); margin-top:2px; }
+  .topbar-actions{ display:flex; align-items:center; gap:10px; }
+
+  .search-box{
+    display:flex; align-items:center; gap:6px;
+    border:1px solid var(--border); background:var(--surface);
+    border-radius:6px; padding:7px 10px; min-width:180px;
+  }
+  .search-box svg{ width:15px; height:15px; color:var(--muted); flex:none; }
+  .search-box input{
+    border:none; background:none; outline:none; color:var(--ink);
+    font-family:var(--font-ui); font-size:13px; width:100%;
+  }
+
+  .btn{
+    display:inline-flex; align-items:center; gap:7px;
+    border-radius:6px; border:1px solid var(--border);
+    padding:8px 13px; font-size:13.5px; font-weight:500;
+    background:var(--surface); color:var(--ink); cursor:pointer;
+    white-space:nowrap;
+  }
+  .btn svg{ width:15px; height:15px; }
+  .btn:hover{ background:var(--surface-2); }
+  .btn-primary{ background:var(--accent); border-color:var(--accent); color:#F2FBFC; }
+  .btn-primary:hover{ background:var(--accent-ink); border-color:var(--accent-ink); }
+  .btn-ghost{ border-color:transparent; background:none; }
+  .btn-ghost:hover{ background:var(--surface-2); }
+  .btn-danger{ color:var(--red); }
+  .btn-sm{ padding:5px 9px; font-size:12.5px; }
+  .icon-btn{
+    border:1px solid var(--border); background:var(--surface); border-radius:6px;
+    width:30px; height:30px; display:inline-flex; align-items:center; justify-content:center; cursor:pointer;
+  }
+  .icon-btn svg{ width:15px; height:15px; }
+  .icon-btn:hover{ background:var(--surface-2); }
+
+  main{ flex:1; padding:20px 22px 60px; max-width:1280px; width:100%; }
+
+  /* ---------- Cards / panels ---------- */
+  .panel{
+    background:var(--surface); border:1px solid var(--border); border-radius:var(--radius);
+    padding:16px 18px;
+  }
+  .panel + .panel{ margin-top:14px; }
+  .panel-accent{ border-left:3px solid var(--accent); }
+
+  .stat-grid{ display:grid; grid-template-columns:repeat(4,1fr); gap:12px; margin-top:14px; }
+  .stat-tile{
+    background:var(--surface); border:1px solid var(--border); border-left:3px solid var(--tone,var(--accent));
+    border-radius:var(--radius); padding:13px 14px;
+  }
+  .stat-tile .stat-label{ font-size:12px; color:var(--muted); }
+  .stat-tile .stat-value{ font-family:var(--font-mono); font-size:22px; font-weight:600; margin-top:4px; }
+  .stat-tile .stat-sub{ font-size:11.5px; color:var(--muted); margin-top:2px; }
+
+  .hero{
+    background:var(--surface); border:1px solid var(--border); border-radius:var(--radius);
+    padding:22px 24px;
+  }
+  .hero-top{ display:flex; align-items:baseline; justify-content:space-between; gap:16px; flex-wrap:wrap; }
+  .hero-label{ font-size:13px; color:var(--muted); }
+  .hero-updated{ font-size:11.5px; color:var(--muted); }
+  .hero-figure{ display:flex; align-items:baseline; gap:8px; margin-top:6px; }
+  .hero-num{ font-family:var(--font-mono); font-size:40px; font-weight:600; letter-spacing:-0.5px; }
+  .hero-unit{ font-size:15px; color:var(--muted); }
+  .gauge{ height:10px; border-radius:5px; background:var(--surface-2); margin-top:14px; overflow:hidden; border:1px solid var(--border); }
+  .gauge-fill{ height:100%; border-radius:5px; background:var(--accent); }
+  .gauge-caption{ display:flex; justify-content:space-between; font-size:11.5px; color:var(--muted); margin-top:6px; }
+
+  .section-title{ font-size:14px; font-weight:600; margin:0 0 2px; }
+  .section-desc{ font-size:12px; color:var(--muted); margin:0 0 10px; }
+
+  .two-col{ display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-top:14px; }
+
+  .mini-list{ display:flex; flex-direction:column; gap:0; }
+  .mini-row{
+    display:flex; align-items:center; justify-content:space-between; gap:10px;
+    padding:9px 0; border-bottom:1px solid var(--border);
+  }
+  .mini-row:last-child{ border-bottom:none; }
+  .mini-row-main{ min-width:0; }
+  .mini-row-title{ font-size:13px; font-weight:500; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .mini-row-sub{ font-size:11.5px; color:var(--muted); margin-top:1px; }
+  .empty-note{ font-size:12.5px; color:var(--muted); padding:10px 0; }
+
+  /* ---------- Tables ---------- */
+  .table-wrap{ overflow-x:auto; border:1px solid var(--border); border-radius:var(--radius); background:var(--surface); }
+  table.tbl{ width:100%; border-collapse:collapse; font-size:13px; min-width:640px; }
+  table.tbl th{
+    text-align:left; font-weight:500; color:var(--muted); font-size:11.5px;
+    padding:10px 12px; border-bottom:1px solid var(--border); background:var(--surface-2);
+    white-space:nowrap;
+  }
+  table.tbl td{ padding:10px 12px; border-bottom:1px solid var(--border); vertical-align:middle; }
+  table.tbl tr:last-child td{ border-bottom:none; }
+  table.tbl tr:hover td{ background:var(--surface-2); }
+  .mono{ font-family:var(--font-mono); font-size:12.5px; }
+  .cell-sub{ font-size:11.5px; color:var(--muted); margin-top:1px; }
+  .cell-actions{ display:flex; gap:6px; justify-content:flex-end; }
+  .link-btn{ background:none; border:none; color:var(--accent); cursor:pointer; font-size:12.5px; padding:0; font-family:inherit; }
+  .link-btn:hover{ text-decoration:underline; }
+  .col-right{ text-align:right; }
+
+  /* ---------- Badges ---------- */
+  .badge{
+    display:inline-flex; align-items:center; gap:5px;
+    padding:3px 9px; border-radius:4px; font-size:11.5px; font-weight:500; white-space:nowrap;
+  }
+  .badge::before{ content:''; width:6px; height:6px; border-radius:50%; background:currentColor; }
+  .badge-teal{ background:var(--accent-soft); color:var(--accent-ink); }
+  .badge-green{ background:var(--green-soft); color:var(--green); }
+  .badge-amber{ background:var(--amber-soft); color:var(--amber); }
+  .badge-red{ background:var(--red-soft); color:var(--red); }
+  .badge-blue{ background:var(--blue-soft); color:var(--blue); }
+  .badge-grey{ background:var(--grey-soft); color:var(--grey-ink); }
+
+  /* ---------- Forms ---------- */
+  .form-grid{ display:grid; grid-template-columns:1fr 1fr; gap:12px 14px; }
+  .field{ display:flex; flex-direction:column; gap:5px; }
+  .field.full{ grid-column:1 / -1; }
+  .field label{ font-size:12px; color:var(--muted); }
+  .field input, .field select, .field textarea{
+    border:1px solid var(--border); border-radius:6px; padding:8px 10px;
+    background:var(--surface); color:var(--ink); font-family:var(--font-ui); font-size:13.5px; width:100%;
+  }
+  .field input:focus, .field select:focus, .field textarea:focus{ border-color:var(--accent); }
+  .field textarea{ resize:vertical; min-height:64px; font-family:var(--font-ui); }
+  .field-hint{ font-size:11px; color:var(--muted); }
+  .form-actions{ display:flex; justify-content:flex-end; gap:10px; margin-top:16px; padding-top:14px; border-top:1px solid var(--border); }
+
+  /* ---------- Modal ---------- */
+  .modal-backdrop{
+    position:fixed; inset:0; background:rgba(6,16,20,0.55);
+    display:flex; align-items:flex-start; justify-content:center;
+    padding:40px 16px; padding-top:calc(40px + env(safe-area-inset-top,0px));
+    overflow-y:auto; z-index:100;
+  }
+  .modal{
+    background:var(--surface); border-radius:10px; border:1px solid var(--border);
+    width:100%; max-width:640px; padding:20px 22px 22px;
+  }
+  .modal-head{ display:flex; align-items:flex-start; justify-content:space-between; gap:12px; margin-bottom:14px; }
+  .modal-title{ font-size:16px; font-weight:600; margin:0; }
+  .modal-sub{ font-size:12px; color:var(--muted); margin-top:2px; }
+  .modal-close{ border:none; background:none; cursor:pointer; color:var(--muted); width:28px; height:28px; display:flex; align-items:center; justify-content:center; border-radius:6px; }
+  .modal-close:hover{ background:var(--surface-2); }
+  #modal-root:empty{ display:none; }
+
+  /* ---------- Toast ---------- */
+  #toast-root{ position:fixed; right:16px; bottom:calc(16px + env(safe-area-inset-bottom,0px)); z-index:200; display:flex; flex-direction:column; gap:8px; }
+  .toast{
+    background:var(--ink); color:var(--bg); padding:10px 14px; border-radius:7px; font-size:13px;
+    box-shadow:0 6px 20px rgba(0,0,0,0.18); animation:toast-in 0.18s ease-out; max-width:320px;
+  }
+  .toast-error{ background:var(--red); color:#FCEEEC; }
+  @keyframes toast-in{ from{ opacity:0; transform:translateY(6px);} to{ opacity:1; transform:translateY(0);} }
+
+  /* ---------- Detail page bits ---------- */
+  .back-link{ display:inline-flex; align-items:center; gap:5px; font-size:12.5px; color:var(--muted); background:none; border:none; cursor:pointer; padding:0; margin-bottom:10px; }
+  .back-link svg{ width:14px; height:14px; }
+  .back-link:hover{ color:var(--ink); }
+  .detail-grid{ display:grid; grid-template-columns:2fr 1fr; gap:14px; align-items:start; }
+  .kv-list{ display:flex; flex-direction:column; gap:9px; }
+  .kv-row{ display:flex; justify-content:space-between; gap:10px; font-size:13px; }
+  .kv-row .k{ color:var(--muted); }
+  .kv-row .v{ text-align:right; }
+  .subhead-row{ display:flex; align-items:center; justify-content:space-between; margin-bottom:8px; }
+
+  .filter-chips{ display:flex; gap:6px; flex-wrap:wrap; margin-bottom:12px; }
+  .chip{
+    border:1px solid var(--border); background:var(--surface); border-radius:20px;
+    padding:6px 12px; font-size:12.5px; cursor:pointer; color:var(--muted);
+  }
+  .chip.active{ background:var(--accent-soft); border-color:var(--accent); color:var(--accent-ink); }
+
+  .cs-card{ border:1px solid var(--border); border-radius:var(--radius); padding:12px 14px; background:var(--surface); }
+  .cs-name{ font-size:13.5px; font-weight:600; }
+  .cs-meta{ font-size:11.5px; color:var(--muted); margin-top:2px; }
+  .cs-grid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:10px; margin-top:12px; }
+
+  @media (max-width: 980px){
+    .stat-grid{ grid-template-columns:repeat(2,1fr); }
+    .two-col{ grid-template-columns:1fr; }
+    .detail-grid{ grid-template-columns:1fr; }
+    .form-grid{ grid-template-columns:1fr; }
+  }
+  .mobile-backdrop{ display:none; }
+  @media (max-width: 880px){
+    .sidebar{
+      position:fixed; left:0; top:0; bottom:0; z-index:90; transform:translateX(-100%);
+      transition:transform 0.2s ease; width:264px;
+    }
+    #app.sidebar-open .sidebar{ transform:translateX(0); }
+    .mobile-backdrop{
+      display:none; position:fixed; inset:0; background:rgba(6,16,20,0.5); z-index:80;
+    }
+    #app.sidebar-open .mobile-backdrop{ display:block; }
+    .hamburger{ display:inline-flex; }
+    .sidebar-close{ display:inline-flex; margin-left:auto; }
+    main{ padding:16px 14px 48px; }
+    .topbar{ padding:12px 14px; padding-top:calc(12px + env(safe-area-inset-top,0px)); }
+    .search-box{ min-width:0; }
+  }
+  @media (max-width: 620px){
+    .stat-grid{ grid-template-columns:1fr 1fr; }
+    .topbar-desc{ display:none; }
+    table.tbl{ min-width:560px; }
+  }
+</style>
+</head>
+<body>
+<div id="auth-root" style="display:none"></div>
+<div id="app" style="display:none">
+  <aside class="sidebar" id="sidebar">
+    <div class="brand">
+      <div class="brand-mark">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#EAF7F8" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 15c3 2 6 2 9 0s6-2 9 0"/><path d="M3 19c3 2 6 2 9 0s6-2 9 0"/><path d="M12 3c2 3 2 6 0 9-2-3-2-6 0-9Z"/><path d="M12 12v3"/></svg>
+      </div>
+      <div>
+        <div class="brand-name">Jejak Laut</div>
+        <div class="brand-sub">PPS Lampulo · Rantai Dingin</div>
+      </div>
+      <button class="icon-btn sidebar-close" data-action="close-sidebar" aria-label="Tutup menu">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+      </button>
+    </div>
+    <nav class="nav-scroll" id="sidebar-nav"></nav>
+    <div class="sidebar-foot" id="sidebar-foot"></div>
+  </aside>
+
+  <div class="mobile-backdrop" data-action="close-sidebar"></div>
+
+  <div class="main-col">
+    <div class="topbar">
+      <button class="hamburger" data-action="open-sidebar" aria-label="Buka menu">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+      </button>
+      <div class="topbar-titles">
+        <h1 class="topbar-title" id="topbar-title">Ringkasan</h1>
+        <div class="topbar-desc" id="topbar-desc"></div>
+      </div>
+      <div class="topbar-actions" id="topbar-actions"></div>
+    </div>
+    <main id="main"></main>
+  </div>
+</div>
+
+<div id="modal-root"></div>
+<div id="toast-root"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+(function(){
+'use strict';
+
+/* ============================================================
+   Utilities
+   ============================================================ */
+function uid(prefix){ return (prefix ? prefix+'_' : '') + Math.random().toString(36).slice(2,9); }
+function esc(s){
+  return String(s===null||s===undefined?'':s).replace(/[&<>"']/g, function(c){
+    return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];
+  });
+}
+function fmtNum(n, d){
+  if(n===null||n===undefined||n==='') return '—';
+  d = d===undefined?1:d;
+  var num = Number(n);
+  if(isNaN(num)) return '—';
+  return num.toLocaleString('id-ID', {minimumFractionDigits:d, maximumFractionDigits:d});
+}
+function fmtDate(iso){
+  if(!iso) return '—';
+  var d = new Date(iso);
+  if(isNaN(d.getTime())) return '—';
+  return d.toLocaleDateString('id-ID', {day:'2-digit', month:'short', year:'numeric'});
+}
+function fmtDateTime(iso){
+  if(!iso) return '—';
+  var d = new Date(iso);
+  if(isNaN(d.getTime())) return '—';
+  return d.toLocaleDateString('id-ID', {day:'2-digit', month:'short', year:'numeric'}) + ', ' +
+         d.toLocaleTimeString('id-ID', {hour:'2-digit', minute:'2-digit'});
+}
+function toLocalInput(iso){
+  if(!iso) return '';
+  var d = new Date(iso);
+  if(isNaN(d.getTime())) return '';
+  function pad(n){ return String(n).padStart(2,'0'); }
+  return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate())+'T'+pad(d.getHours())+':'+pad(d.getMinutes());
+}
+function fromLocalInput(val){
+  if(!val) return null;
+  var d = new Date(val);
+  if(isNaN(d.getTime())) return null;
+  return d.toISOString();
+}
+function nowIso(){ return new Date().toISOString(); }
+function daysAgoIso(n, hour){
+  var d = new Date();
+  d.setDate(d.getDate()-n);
+  if(hour!==undefined) d.setHours(hour, (n*7)%60, 0, 0);
+  return d.toISOString();
+}
+
+/* ============================================================
+   Enum metadata: [label, tone]
+   ============================================================ */
+var ENUMS = {
+  user_role: {
+    admin:['Admin','grey'], qc_staff:['Staf QC','blue'], warehouse_staff:['Staf gudang','grey'],
+    driver:['Sopir','grey'], finance:['Keuangan','grey'], management:['Manajemen','grey']
+  },
+  product_status: {
+    in_stock:['Di gudang','green'], reserved:['Dipesan','amber'], in_transit:['Dalam perjalanan','blue'],
+    delivered:['Terkirim','teal'], damaged:['Rusak','red']
+  },
+  processing_type: {
+    whole:['Utuh',null], gg:['GG (siang & insang)',null], fillet:['Fillet',null], loin:['Loin',null], hgt:['HGT',null]
+  },
+  transport_type: {
+    reefer_truck:['Truk reefer',null], reefer_container:['Kontainer reefer',null], air_freight:['Kargo udara',null]
+  },
+  shipment_status: {
+    preparing:['Persiapan','grey'], loading:['Muat barang','amber'], in_transit:['Dalam perjalanan','blue'],
+    arrived:['Tiba','teal'], completed:['Selesai','green'], cancelled:['Dibatalkan','red']
+  },
+  claim_type: {
+    weight_shrinkage:['Susut berat',null], quality_degradation:['Penurunan mutu',null],
+    packaging_damaged:['Kemasan rusak',null], late_delivery:['Keterlambatan',null]
+  },
+  claim_status: {
+    pending:['Menunggu','amber'], approved:['Disetujui','green'], rejected:['Ditolak','red']
+  }
+};
+function enumLabel(type, val){ var m = ENUMS[type] && ENUMS[type][val]; return m ? m[0] : (val || '—'); }
+function enumBadge(type, val){
+  var m = ENUMS[type] && ENUMS[type][val];
+  var tone = m ? (m[1] || 'grey') : 'grey';
+  return '<span class="badge badge-'+tone+'">'+esc(m?m[0]:(val||'—'))+'</span>';
+}
+function enumOptions(type, selected){
+  var out = '';
+  var entries = ENUMS[type];
+  for(var k in entries){
+    out += '<option value="'+k+'" '+(k===selected?'selected':'')+'>'+esc(entries[k][0])+'</option>';
+  }
+  return out;
+}
+
+/* ============================================================
+   Roles & access control
+   ============================================================ */
+// Halaman yang boleh dilihat tiap peran (menentukan menu sidebar & proteksi rute)
+var ROLE_PAGES = {
+  admin:['dashboard','batches','inventory','shipments','logs','claims','vessels','buyers','coldstorages','users','reports','settings'],
+  management:['dashboard','batches','inventory','shipments','logs','claims','vessels','buyers','coldstorages','reports'],
+  qc_staff:['dashboard','batches','inventory','vessels'],
+  warehouse_staff:['dashboard','inventory','coldstorages','shipments','logs'],
+  driver:['dashboard','shipments','logs'],
+  finance:['dashboard','buyers','claims','reports']
+};
+// Peran yang boleh menambah/mengubah/menghapus data master & operasional (bukan sekadar mencatat log/klaim)
+var ROLE_CAN_MANAGE = {
+  admin:true, management:false, qc_staff:true, warehouse_staff:true, driver:false, finance:false
+};
+function currentRole(){ return currentUser ? currentUser.role : null; }
+function canManage(){ return !!(currentUser && ROLE_CAN_MANAGE[currentUser.role]); }
+function canApproveClaims(){ return !!(currentUser && (currentUser.role==='admin' || currentUser.role==='management')); }
+function allowedPages(){ return (currentUser && ROLE_PAGES[currentUser.role]) || ['dashboard']; }
+function rowActions(editAction, deleteAction, id, allowed){
+  if(!allowed) return '<td class="col-right"></td>';
+  return '<td class="col-right"><div class="cell-actions">'+
+    '<button class="icon-btn" data-action="'+editAction+'" data-id="'+id+'" title="Ubah">'+icon('pencil')+'</button>'+
+    '<button class="icon-btn btn-danger" data-action="'+deleteAction+'" data-id="'+id+'" title="Hapus">'+icon('trash')+'</button>'+
+    '</div></td>';
+}
+
+/* ============================================================
+   Icons (line-style, self-contained)
+   ============================================================ */
+function icon(name){
+  var W = 'fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"';
+  var paths = {
+    grid:'<rect x="3" y="3" width="8" height="8" rx="1.5"/><rect x="13" y="3" width="8" height="8" rx="1.5"/><rect x="3" y="13" width="8" height="8" rx="1.5"/><rect x="13" y="13" width="8" height="8" rx="1.5"/>',
+    waves:'<path d="M3 15c3 2 6 2 9 0s6-2 9 0"/><path d="M3 19c3 2 6 2 9 0s6-2 9 0"/><path d="M7 9l2-4 2 4 2-4 2 4"/>',
+    box:'<path d="M21 8l-9-5-9 5 9 5 9-5Z"/><path d="M3 8v9l9 5 9-5V8"/><path d="M12 13v9"/>',
+    anchor:'<circle cx="12" cy="5" r="2.2"/><path d="M12 7.2V21"/><path d="M5 13a7 7 0 0 0 14 0"/><path d="M3 13h4M17 13h4"/>',
+    briefcase:'<rect x="3" y="7" width="18" height="13" rx="2"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M3 12h18"/>',
+    snow:'<path d="M12 2v20M4.2 7l15.6 10M4.2 17l15.6-10"/>',
+    truck:'<rect x="2" y="7" width="13" height="10" rx="1.5"/><path d="M15 10h4l3 3v4h-7v-7Z"/><circle cx="7" cy="19" r="1.7"/><circle cx="17.5" cy="19" r="1.7"/>',
+    map:'<path d="M9 4 3 6v14l6-2 6 2 6-2V4l-6 2-6-2Z"/><path d="M9 4v14M15 6v14"/>',
+    check:'<path d="M6 12l4 4 8-9"/><rect x="3" y="3" width="18" height="18" rx="3"/>',
+    alert:'<path d="M12 3 2 20h20L12 3Z"/><path d="M12 10v5"/><circle cx="12" cy="17.5" r="0.6" fill="currentColor" stroke="none"/>',
+    users:'<circle cx="8.5" cy="8" r="3.2"/><path d="M2.5 20c0-3.6 2.7-6 6-6s6 2.4 6 6"/><circle cx="17" cy="8.5" r="2.6"/><path d="M15 14.2c2.5 0.4 4 2.6 4 5.8"/>',
+    search:'<circle cx="10.5" cy="10.5" r="6.5"/><path d="M20 20l-4.4-4.4"/>',
+    plus:'<path d="M12 5v14M5 12h14"/>',
+    pencil:'<path d="M4 20l1-4.2L15.6 5.2a1.8 1.8 0 0 1 2.6 0l0.6 0.6a1.8 1.8 0 0 1 0 2.6L8.2 19 4 20Z"/>',
+    trash:'<path d="M4 7h16"/><path d="M9 7V5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2"/><path d="M6 7l1 13a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-13"/>',
+    chevron:'<path d="M9 6l6 6-6 6"/>',
+    close:'<path d="M6 6l12 12M18 6L6 18"/>',
+    menu:'<path d="M4 7h16M4 12h16M4 17h16"/>',
+    pin:'<path d="M12 21s7-6.3 7-11.5A7 7 0 0 0 5 9.5C5 14.7 12 21 12 21Z"/><circle cx="12" cy="9.5" r="2.3"/>',
+    thermo:'<path d="M12 14.5V5a2 2 0 0 0-4 0v9.5a4 4 0 1 0 4 0Z"/>',
+    doc:'<path d="M6 3h9l4 4v14H6Z"/><path d="M15 3v4h4"/><path d="M9 13h6M9 17h6"/>',
+    package:'<path d="M21 8l-9-5-9 5 9 5 9-5Z"/><path d="M3 8v9l9 5 9-5V8"/><path d="M12 13v9"/><path d="M6.5 6l9 5"/>',
+    sliders:'<path d="M4 6h5M13 6h7M4 18h9M17 18h3M4 12h13M21 12h-1"/><circle cx="10.5" cy="6" r="2"/><circle cx="15" cy="12" r="2"/><circle cx="12.5" cy="18" r="2"/>',
+    upload:'<path d="M12 16V4M7 9l5-5 5 5"/><path d="M4 16v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3"/>',
+    download:'<path d="M12 4v12M7 11l5 5 5-5"/><path d="M4 19h16"/>',
+    dot:'<circle cx="12" cy="12" r="3"/>',
+    settings:'<circle cx="12" cy="12" r="3"/><path d="M19.4 13a1.7 1.7 0 0 0 .3 1.9l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.5V19a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1-1.6 1.7 1.7 0 0 0-1.9.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.9 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.6-1 1.7 1.7 0 0 0-.3-1.9l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.9.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.9-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.9V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1Z"/>',
+    download:'<path d="M12 3v13"/><path d="M6.5 11.5 12 17l5.5-5.5"/><path d="M4 20h16"/>',
+    upload:'<path d="M12 21V8"/><path d="M6.5 12.5 12 7l5.5 5.5"/><path d="M4 20h16"/>',
+    plug:'<path d="M9 3v5M15 3v5"/><path d="M6 8h12l-1 5a5 5 0 0 1-10 0L6 8Z"/><path d="M12 17v4"/>',
+    database:'<ellipse cx="12" cy="5.5" rx="8" ry="2.8"/><path d="M4 5.5V12c0 1.5 3.6 2.8 8 2.8s8-1.3 8-2.8V5.5"/><path d="M4 12v6.5c0 1.5 3.6 2.8 8 2.8s8-1.3 8-2.8V12"/>',
+    copy:'<rect x="8.5" y="8.5" width="11.5" height="11.5" rx="1.8"/><path d="M15 8.5V5.8A1.8 1.8 0 0 0 13.2 4H5.8A1.8 1.8 0 0 0 4 5.8v7.4A1.8 1.8 0 0 0 5.8 15h2.7"/>'
+  };
+  return '<svg viewBox="0 0 24 24" '+W+'>'+(paths[name]||paths.dot)+'</svg>';
+}
+
+/* ============================================================
+   Seed data
+   ============================================================ */
+function seedData(){
+  var DEMO_PASSWORD = 'demo123';
+  var users = [
+    {id:'u1', full_name:'Rina Marlina', email:'rina.marlina@lampulo.id', phone_number:'0812-6000-1101', role:'admin', branch_location:'Banda Aceh', password:DEMO_PASSWORD, auth_user_id:null},
+    {id:'u2', full_name:'Fadli Ansari', email:'fadli.ansari@lampulo.id', phone_number:'0812-6000-1102', role:'qc_staff', branch_location:'Banda Aceh', password:DEMO_PASSWORD, auth_user_id:null},
+    {id:'u3', full_name:'Yusra Aini', email:'yusra.aini@lampulo.id', phone_number:'0812-6000-1103', role:'qc_staff', branch_location:'Banda Aceh', password:DEMO_PASSWORD, auth_user_id:null},
+    {id:'u4', full_name:'Teuku Rizal', email:'teuku.rizal@lampulo.id', phone_number:'0812-6000-1104', role:'warehouse_staff', branch_location:'Banda Aceh', password:DEMO_PASSWORD, auth_user_id:null},
+    {id:'u5', full_name:'Iqbal Maulana', email:'iqbal.maulana@lampulo.id', phone_number:'0812-6000-1105', role:'driver', branch_location:'Banda Aceh', password:DEMO_PASSWORD, auth_user_id:null},
+    {id:'u6', full_name:'Dedi Kurniawan', email:'dedi.kurniawan@lampulo.id', phone_number:'0812-6000-1106', role:'driver', branch_location:'Sabang', password:DEMO_PASSWORD, auth_user_id:null},
+    {id:'u7', full_name:'Cut Mala Sari', email:'cut.mala@lampulo.id', phone_number:'0812-6000-1107', role:'finance', branch_location:'Banda Aceh', password:DEMO_PASSWORD, auth_user_id:null},
+    {id:'u8', full_name:'Hendra Gunawan', email:'hendra.gunawan@lampulo.id', phone_number:'0812-6000-1108', role:'management', branch_location:'Banda Aceh', password:DEMO_PASSWORD, auth_user_id:null}
+  ];
+
+  var vessels = [
+    {id:'v1', vessel_name:'KM Bahari Jaya 02', registration_number:'BA.1234/ZC', captain_name:'Munir Ismail', gross_tonnage:28},
+    {id:'v2', vessel_name:'KM Samudera Lestari', registration_number:'BA.5566/ZC', captain_name:'Syahril Putra', gross_tonnage:45},
+    {id:'v3', vessel_name:'KM Rizky Perkasa', registration_number:'BA.7788/ZC', captain_name:'Yanto Saputra', gross_tonnage:32},
+    {id:'v4', vessel_name:'KM Cahaya Laot', registration_number:'BA.3321/ZC', captain_name:'Adi Firmansyah', gross_tonnage:19},
+    {id:'v5', vessel_name:'KM Aceh Mandiri', registration_number:'BA.9012/ZC', captain_name:'Fauzan Ridha', gross_tonnage:60}
+  ];
+
+  var buyers = [
+    {id:'b1', company_name:'PT Aceh Tuna Ekspor', contact_person:'Andi Wijaya', phone_number:'021-5551-2201', address:'Kawasan Berikat Nusantara, Jakarta Utara', destination_province:'DKI Jakarta'},
+    {id:'b2', company_name:'CV Samudera Segar', contact_person:'Boy Hasibuan', phone_number:'061-4551-3390', address:'Jl. Krakatau No. 21, Medan', destination_province:'Sumatera Utara'},
+    {id:'b3', company_name:'PT Mina Nusantara Prima', contact_person:'Dewi Anggraini', phone_number:'031-8871-4420', address:'Jl. Kalianak No. 88, Surabaya', destination_province:'Jawa Timur'},
+    {id:'b4', company_name:'UD Ikan Beku Sejahtera', contact_person:'Muhammad Nasir', phone_number:'0651-778-2233', address:'Jl. Sultan Iskandar Muda, Banda Aceh', destination_province:'Aceh'}
+  ];
+
+  var coldStorages = [
+    {id:'cs1', storage_name:'Cold Storage Lampulo Utama', location_city:'Banda Aceh', max_capacity_tons:150, target_temperature_celsius:-20},
+    {id:'cs2', storage_name:'Cold Storage Krueng Raya', location_city:'Aceh Besar', max_capacity_tons:80, target_temperature_celsius:-18},
+    {id:'cs3', storage_name:'Cold Storage Sabang Frozen', location_city:'Sabang', max_capacity_tons:40, target_temperature_celsius:-22}
+  ];
+
+  var catchBatches = [
+    {id:'cb1', lot_number:'LOT-AC-2026-0091', vessel_id:'v1', landing_date:daysAgoIso(14,6), landing_port:'PPS Lampulo', wpp_zone:'WPPNRI 572', qc_officer_id:'u2', notes:'Hasil tangkapan bersih, tidak ada indikasi cold chain terputus.'},
+    {id:'cb2', lot_number:'LOT-AC-2026-0092', vessel_id:'v2', landing_date:daysAgoIso(11,7), landing_port:'PPS Lampulo', wpp_zone:'WPPNRI 572', qc_officer_id:'u3', notes:'Sebagian tuna grade B karena luka jaring.'},
+    {id:'cb3', lot_number:'LOT-AC-2026-0093', vessel_id:'v3', landing_date:daysAgoIso(9,8), landing_port:'PPS Lampulo', wpp_zone:'WPPNRI 572', qc_officer_id:'u2', notes:''},
+    {id:'cb4', lot_number:'LOT-AC-2026-0094', vessel_id:'v4', landing_date:daysAgoIso(6,6), landing_port:'PPS Lampulo', wpp_zone:'WPPNRI 572', qc_officer_id:'u3', notes:'Cakalang & tongkol, volume kecil.'},
+    {id:'cb5', lot_number:'LOT-AC-2026-0095', vessel_id:'v5', landing_date:daysAgoIso(3,7), landing_port:'PPS Lampulo', wpp_zone:'WPPNRI 572', qc_officer_id:'u2', notes:'Tangkapan besar, perlu percepatan pembongkaran.'},
+    {id:'cb6', lot_number:'LOT-AC-2026-0096', vessel_id:'v1', landing_date:daysAgoIso(1,9), landing_port:'PPS Lampulo', wpp_zone:'WPPNRI 572', qc_officer_id:'u3', notes:''}
+  ];
+
+  var inventoryItems = [
+    {id:'i1', qr_code_id:'QR-91001', batch_id:'cb1', fish_species:'Tuna Sirip Kuning', processing_type:'loin', grade:'A', gross_weight_kg:210, net_weight_kg:198, core_temperature_celsius:-19.5, status:'in_stock'},
+    {id:'i2', qr_code_id:'QR-91002', batch_id:'cb1', fish_species:'Tuna Sirip Kuning', processing_type:'whole', grade:'A', gross_weight_kg:340, net_weight_kg:330, core_temperature_celsius:-19.2, status:'delivered'},
+    {id:'i3', qr_code_id:'QR-91003', batch_id:'cb1', fish_species:'Tuna Mata Besar', processing_type:'fillet', grade:'B', gross_weight_kg:150, net_weight_kg:140, core_temperature_celsius:-18.8, status:'in_stock'},
+    {id:'i4', qr_code_id:'QR-92001', batch_id:'cb2', fish_species:'Tuna Sirip Kuning', processing_type:'gg', grade:'B', gross_weight_kg:190, net_weight_kg:178, core_temperature_celsius:-19.0, status:'in_stock'},
+    {id:'i5', qr_code_id:'QR-92002', batch_id:'cb2', fish_species:'Kakap Merah', processing_type:'whole', grade:'A', gross_weight_kg:95, net_weight_kg:90, core_temperature_celsius:-19.6, status:'reserved'},
+    {id:'i6', qr_code_id:'QR-93001', batch_id:'cb3', fish_species:'Cakalang', processing_type:'whole', grade:'A', gross_weight_kg:260, net_weight_kg:248, core_temperature_celsius:-20.1, status:'delivered'},
+    {id:'i7', qr_code_id:'QR-93002', batch_id:'cb3', fish_species:'Tongkol', processing_type:'hgt', grade:'B', gross_weight_kg:130, net_weight_kg:120, core_temperature_celsius:-18.4, status:'in_stock'},
+    {id:'i8', qr_code_id:'QR-94001', batch_id:'cb4', fish_species:'Cakalang', processing_type:'whole', grade:'A', gross_weight_kg:175, net_weight_kg:166, core_temperature_celsius:-19.3, status:'in_transit'},
+    {id:'i9', qr_code_id:'QR-94002', batch_id:'cb4', fish_species:'Tongkol', processing_type:'whole', grade:'C', gross_weight_kg:80, net_weight_kg:74, core_temperature_celsius:-15.2, status:'damaged'},
+    {id:'i10', qr_code_id:'QR-95001', batch_id:'cb5', fish_species:'Tuna Sirip Kuning', processing_type:'loin', grade:'A', gross_weight_kg:410, net_weight_kg:392, core_temperature_celsius:-19.8, status:'in_transit'},
+    {id:'i11', qr_code_id:'QR-95002', batch_id:'cb5', fish_species:'Tuna Mata Besar', processing_type:'whole', grade:'A', gross_weight_kg:300, net_weight_kg:288, core_temperature_celsius:-19.9, status:'reserved'},
+    {id:'i12', qr_code_id:'QR-96001', batch_id:'cb6', fish_species:'Kakap Merah', processing_type:'fillet', grade:'A', gross_weight_kg:120, net_weight_kg:112, core_temperature_celsius:-19.4, status:'in_stock'}
+  ];
+
+  var shipments = [
+    {id:'s1', shipment_number:'SHP-2026-0041', buyer_id:'b1', driver_id:'u5', transport_type:'air_freight', vehicle_plate_number:'—', seal_number:'SL-88213', health_certificate_number:'HC/BA/2026/0301', departure_time:daysAgoIso(8,15), estimated_arrival:daysAgoIso(7,20), actual_arrival:daysAgoIso(7,19), status:'completed'},
+    {id:'s2', shipment_number:'SHP-2026-0042', buyer_id:'b3', driver_id:'u5', transport_type:'reefer_container', vehicle_plate_number:'BL 1234 AA', seal_number:'SL-88214', health_certificate_number:'HC/BA/2026/0302', departure_time:daysAgoIso(4,10), estimated_arrival:daysAgoIso(1,10), actual_arrival:null, status:'in_transit'},
+    {id:'s3', shipment_number:'SHP-2026-0043', buyer_id:'b2', driver_id:'u6', transport_type:'reefer_truck', vehicle_plate_number:'BL 5678 BB', seal_number:'SL-88215', health_certificate_number:'HC/BA/2026/0303', departure_time:daysAgoIso(2,9), estimated_arrival:daysAgoIso(0,18), actual_arrival:null, status:'loading'},
+    {id:'s4', shipment_number:'SHP-2026-0044', buyer_id:'b4', driver_id:'u6', transport_type:'reefer_truck', vehicle_plate_number:'BL 9911 CC', seal_number:'SL-88216', health_certificate_number:'HC/BA/2026/0304', departure_time:null, estimated_arrival:null, actual_arrival:null, status:'preparing'}
+  ];
+
+  var shipmentItems = [
+    {id:'si1', shipment_id:'s1', item_id:'i2'},
+    {id:'si2', shipment_id:'s1', item_id:'i6'},
+    {id:'si3', shipment_id:'s2', item_id:'i8'},
+    {id:'si4', shipment_id:'s2', item_id:'i10'},
+    {id:'si5', shipment_id:'s3', item_id:'i9'}
+  ];
+
+  var shipmentLogs = [
+    {id:'lg1', shipment_id:'s2', recorded_at:daysAgoIso(4,10), latitude:5.5483, longitude:95.3238, storage_temperature_celsius:-19.4, recorded_by:'u5', image_url:''},
+    {id:'lg2', shipment_id:'s2', recorded_at:daysAgoIso(3,14), latitude:4.6951, longitude:96.7494, storage_temperature_celsius:-19.1, recorded_by:'u5', image_url:''},
+    {id:'lg3', shipment_id:'s2', recorded_at:daysAgoIso(2,9), latitude:3.5952, longitude:98.6722, storage_temperature_celsius:-18.9, recorded_by:'u5', image_url:''},
+    {id:'lg4', shipment_id:'s1', recorded_at:daysAgoIso(8,16), latitude:5.5483, longitude:95.3238, storage_temperature_celsius:-19.8, recorded_by:'u5', image_url:''},
+    {id:'lg5', shipment_id:'s1', recorded_at:daysAgoIso(7,18), latitude:-6.1256, longitude:106.6559, storage_temperature_celsius:-19.5, recorded_by:'u5', image_url:''}
+  ];
+
+  var proofOfDeliveries = [
+    {id:'pod1', shipment_id:'s1', received_at:daysAgoIso(7,19), recipient_name:'Andi Wijaya', digital_signature_url:'', total_boxes_received:24, total_net_weight_received:328, receiving_temperature_celsius:-18.6}
+  ];
+
+  var claims = [
+    {id:'cl1', shipment_id:'s1', item_id:'i2', claim_type:'quality_degradation', claimed_weight_kg:12, description:'Sebagian tuna mengalami perubahan warna saat diterima, diduga akibat fluktuasi suhu selama penerbangan.', photo_evidence_url:'', status:'pending', resolved_by:null},
+    {id:'cl2', shipment_id:'s3', item_id:'i9', claim_type:'packaging_damaged', claimed_weight_kg:6, description:'Kemasan styrofoam retak pada 2 koli saat pemuatan.', photo_evidence_url:'', status:'approved', resolved_by:'u1'},
+    {id:'cl3', shipment_id:'s2', item_id:null, claim_type:'late_delivery', claimed_weight_kg:null, description:'Estimasi tiba meleset akibat kemacetan lintas Sumatera, pembeli meminta kompensasi.', photo_evidence_url:'', status:'pending', resolved_by:null}
+  ];
+
+  return {
+    users:users, vessels:vessels, buyers:buyers, coldStorages:coldStorages,
+    catchBatches:catchBatches, inventoryItems:inventoryItems, shipments:shipments,
+    shipmentItems:shipmentItems, shipmentLogs:shipmentLogs, proofOfDeliveries:proofOfDeliveries,
+    claims:claims
+  };
+}
+
+/* ============================================================
+   Storage
+   ============================================================ */
+var STORAGE_KEY = 'jejak_laut_db_v1';
+var SUPA_CFG_KEY = 'jejak_laut_supabase_cfg_v1';
+function loadDB(){
+  try{
+    var raw = localStorage.getItem(STORAGE_KEY);
+    if(raw){ var parsed = JSON.parse(raw); if(parsed && parsed.users) return parsed; }
+  }catch(e){ /* ignore, fall back to seed */ }
+  return seedData();
+}
+function saveDB(){
+  if(mode!=='demo') return;
+  try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(db)); }
+  catch(e){ /* storage unavailable, continue in-memory */ }
+}
+function loadSupaConfig(){
+  try{
+    var raw = localStorage.getItem(SUPA_CFG_KEY);
+    if(raw) return JSON.parse(raw);
+  }catch(e){}
+  return null;
+}
+function saveSupaConfig(cfg){
+  try{ localStorage.setItem(SUPA_CFG_KEY, JSON.stringify(cfg)); }catch(e){}
+}
+function clearSupaConfig(){
+  try{ localStorage.removeItem(SUPA_CFG_KEY); }catch(e){}
+}
+
+var db = loadDB();
+var route = {page:'dashboard', id:null};
+var searchTerm = '';
+var invFilter = 'all';
+var claimFilter = 'all';
+var mode = 'demo';
+var supaClient = null;
+var lastImportReport = null;
+var currentUser = null;
+var authError = null;
+var authEmail = '';
+var authView = 'login'; // 'login' | 'signup'
+var authNotice = null;
+
+/* ============================================================
+   Supabase (live database) integration
+   ============================================================ */
+var SUPA_TABLES = {
+  users:'users', vessels:'vessels', buyers:'buyers', coldStorages:'cold_storages',
+  catchBatches:'catch_batches', inventoryItems:'inventory_items', shipments:'shipments',
+  shipmentItems:'shipment_items', shipmentLogs:'shipment_logs',
+  proofOfDeliveries:'proof_of_deliveries', claims:'claims'
+};
+function orNull(v){ return (v===undefined || v===null || v==='') ? null : v; }
+
+async function supaFetchAll(){
+  var next = {};
+  for(var key in SUPA_TABLES){
+    var res = await supaClient.from(SUPA_TABLES[key]).select('*');
+    if(res.error) throw res.error;
+    next[key] = res.data || [];
+  }
+  db = next;
+}
+async function persistInsert(key, payload, demoPrefix){
+  if(mode==='live'){
+    var res = await supaClient.from(SUPA_TABLES[key]).insert(payload).select().single();
+    if(res.error) throw res.error;
+    db[key].push(res.data);
+    return res.data;
+  }
+  var row = Object.assign({id: uid(demoPrefix||key)}, payload);
+  db[key].push(row);
+  return row;
+}
+async function persistUpdate(key, id, payload){
+  if(mode==='live'){
+    var res = await supaClient.from(SUPA_TABLES[key]).update(payload).eq('id', id).select().single();
+    if(res.error) throw res.error;
+    var idx = db[key].findIndex(function(r){ return r.id===id; });
+    if(idx>-1) db[key][idx] = res.data;
+    return res.data;
+  }
+  var row = byId(db[key], id);
+  if(row) Object.assign(row, payload);
+  return row;
+}
+async function persistDelete(key, id){
+  if(mode==='live'){
+    var res = await supaClient.from(SUPA_TABLES[key]).delete().eq('id', id);
+    if(res.error) throw res.error;
+  }
+  removeById(db[key], id);
+}
+function connectSupabaseClient(url, key){
+  if(!window.supabase || !window.supabase.createClient){
+    throw new Error('Pustaka Supabase belum termuat di halaman ini.');
+  }
+  supaClient = window.supabase.createClient(url, key);
+  mode = 'live';
+  saveSupaConfig({url:url, key:key});
+}
+async function connectSupabase(url, key){
+  // Dipakai dari halaman Pengaturan saat sudah masuk (admin) — langsung tarik seluruh data.
+  connectSupabaseClient(url, key);
+  await supaFetchAll();
+}
+function disconnectSupabase(){
+  if(supaClient){ try{ supaClient.auth.signOut(); }catch(e){} }
+  supaClient = null;
+  mode = 'demo';
+  clearSupaConfig();
+  db = loadDB();
+  currentUser = null;
+  clearSessionUserId();
+}
+function toastError(err){
+  var msg = (err && err.message) ? err.message : 'Terjadi kesalahan.';
+  toast(msg, true);
+}
+
+/* ============================================================
+   Autentikasi (login / logout)
+   ============================================================ */
+var SESSION_KEY = 'jejak_laut_session_v1';
+function saveSessionUserId(id){ try{ localStorage.setItem(SESSION_KEY, id); }catch(e){} }
+function loadSessionUserId(){ try{ return localStorage.getItem(SESSION_KEY); }catch(e){ return null; } }
+function clearSessionUserId(){ try{ localStorage.removeItem(SESSION_KEY); }catch(e){} }
+
+function findProfileForAuthUser(authUser){
+  if(!authUser) return null;
+  var byAuthId = db.users.find(function(u){ return u.auth_user_id && u.auth_user_id===authUser.id; });
+  if(byAuthId) return byAuthId;
+  if(authUser.email){
+    return db.users.find(function(u){ return u.email && u.email.toLowerCase()===authUser.email.toLowerCase(); }) || null;
+  }
+  return null;
+}
+
+async function doLogin(email, password){
+  if(mode==='live'){
+    if(!supaClient) throw new Error('Belum tersambung ke Supabase. Sambungkan proyek Anda terlebih dahulu.');
+    var res = await supaClient.auth.signInWithPassword({email:email, password:password});
+    if(res.error) throw new Error(res.error.message || 'Email atau kata sandi salah.');
+    await supaFetchAll();
+    var profile = findProfileForAuthUser(res.data.user);
+    if(!profile){
+      await supaClient.auth.signOut();
+      throw new Error('Berhasil masuk ke Supabase, tetapi tidak ada profil pada tabel "users" yang cocok (isi kolom auth_user_id atau samakan email).');
+    }
+    currentUser = profile;
+  } else {
+    var u = db.users.find(function(x){ return x.email && x.email.toLowerCase()===email.toLowerCase() && x.password===password; });
+    if(!u) throw new Error('Email atau kata sandi salah.');
+    currentUser = u;
+    saveSessionUserId(u.id);
+  }
+}
+async function doLogout(){
+  if(mode==='live' && supaClient){ try{ await supaClient.auth.signOut(); }catch(err){} }
+  currentUser = null;
+  clearSessionUserId();
+  authView = 'login'; authNotice = null; authError = null;
+  route = {page:'dashboard', id:null};
+  renderShell();
+}
+
+// Pendaftaran mandiri staf lewat tautan undangan (opsi "Undangan via link daftar mandiri").
+// Profil (nama, peran, email) harus sudah dibuat admin di menu Pengguna lebih dulu;
+// fungsi ini hanya membuat akun Supabase Auth-nya lalu menautkannya via kecocokan email.
+async function doSignup(email, password, confirmPassword){
+  if(mode!=='live' || !supaClient) throw new Error('Sambungkan ke Supabase terlebih dahulu sebelum mendaftar.');
+  if(password.length<6) throw new Error('Kata sandi minimal 6 karakter.');
+  if(password!==confirmPassword) throw new Error('Konfirmasi kata sandi tidak sama dengan kata sandi.');
+  var profile = db.users.find(function(u){ return u.email && u.email.toLowerCase()===email.toLowerCase(); });
+  if(!profile) throw new Error('Email ini belum didaftarkan sebagai staf. Minta admin menambahkannya dulu di menu Pengguna.');
+  var res = await supaClient.auth.signUp({email:email, password:password});
+  if(res.error) throw new Error(res.error.message || 'Pendaftaran gagal.');
+  var authUserId = res.data && res.data.user && res.data.user.id;
+  if(authUserId){
+    try{ await persistUpdate('users', profile.id, {auth_user_id:authUserId}); }catch(err){ /* tetap lanjut, nanti bisa cocok lewat email */ }
+  }
+  if(res.data && res.data.session){
+    // Proyek tidak mewajibkan verifikasi email — langsung aktif.
+    await supaFetchAll();
+    currentUser = findProfileForAuthUser(res.data.user) || profile;
+    return {needsConfirmation:false};
+  }
+  return {needsConfirmation:true};
+}
+
+// Buka layar login/daftar lewat tautan undangan berformat #signup=<email>
+function consumeInviteHash(){
+  var h = window.location.hash || '';
+  var m = h.match(/^#signup=(.*)$/);
+  if(m){
+    authView = 'signup';
+    authEmail = decodeURIComponent(m[1]);
+    try{ history.replaceState(null, '', window.location.pathname + window.location.search); }catch(e){}
+  }
+}
+
+/* ============================================================
+   Lookups
+   ============================================================ */
+function byId(list, id){ for(var i=0;i<list.length;i++){ if(list[i].id===id) return list[i]; } return null; }
+function user(id){ return byId(db.users, id); }
+function vessel(id){ return byId(db.vessels, id); }
+function buyer(id){ return byId(db.buyers, id); }
+function batch(id){ return byId(db.catchBatches, id); }
+function item(id){ return byId(db.inventoryItems, id); }
+function shipment(id){ return byId(db.shipments, id); }
+function userName(id){ var u = user(id); return u ? u.full_name : '—'; }
+function vesselName(id){ var v = vessel(id); return v ? v.vessel_name : '—'; }
+function buyerName(id){ var b = buyer(id); return b ? b.company_name : '—'; }
+function batchLot(id){ var b = batch(id); return b ? b.lot_number : '—'; }
+
+function itemsInBatch(batchId){ return db.inventoryItems.filter(function(it){ return it.batch_id===batchId; }); }
+function itemsInShipment(shipId){
+  var links = db.shipmentItems.filter(function(si){ return si.shipment_id===shipId; });
+  return links.map(function(si){ return {link:si, item:item(si.item_id)}; }).filter(function(x){ return x.item; });
+}
+function logsForShipment(shipId){
+  return db.shipmentLogs.filter(function(l){ return l.shipment_id===shipId; })
+    .sort(function(a,b){ return new Date(a.recorded_at) - new Date(b.recorded_at); });
+}
+function podForShipment(shipId){ return db.proofOfDeliveries.filter(function(p){ return p.shipment_id===shipId; })[0] || null; }
+function claimsForShipment(shipId){ return db.claims.filter(function(c){ return c.shipment_id===shipId; }); }
+function claimsCountForShipment(shipId){ return claimsForShipment(shipId).length; }
+
+function opts(list, valKey, labelFn, selected, placeholder){
+  var out = '<option value="">'+esc(placeholder||'— pilih —')+'</option>';
+  list.forEach(function(it){
+    out += '<option value="'+it[valKey]+'" '+(it[valKey]===selected?'selected':'')+'>'+esc(labelFn(it))+'</option>';
+  });
+  return out;
+}
+
+/* ============================================================
+   Toast
+   ============================================================ */
+function toast(msg, isError){
+  var root = document.getElementById('toast-root');
+  var el = document.createElement('div');
+  el.className = 'toast' + (isError ? ' toast-error' : '');
+  el.textContent = msg;
+  root.appendChild(el);
+  setTimeout(function(){ el.style.transition='opacity .25s'; el.style.opacity='0'; setTimeout(function(){ el.remove(); }, 260); }, isError?4200:2400);
+}
+function copyToClipboard(text){
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(text).catch(function(){ fallbackCopy(text); });
+  } else {
+    fallbackCopy(text);
+  }
+}
+function fallbackCopy(text){
+  var ta = document.createElement('textarea');
+  ta.value = text; ta.style.position='fixed'; ta.style.opacity='0';
+  document.body.appendChild(ta); ta.select();
+  try{ document.execCommand('copy'); }catch(e){}
+  document.body.removeChild(ta);
+}
+
+/* ============================================================
+   Table helper
+   ============================================================ */
+function table(headers, rowsHtml, emptyMsg){
+  if(!rowsHtml.length){
+    return '<div class="table-wrap"><table class="tbl"><thead><tr>'+headers.map(function(h){return '<th>'+h+'</th>';}).join('')+'</tr></thead>'+
+      '<tbody><tr><td colspan="'+headers.length+'"><div class="empty-note">'+esc(emptyMsg||'Belum ada data.')+'</div></td></tr></tbody></table></div>';
+  }
+  return '<div class="table-wrap"><table class="tbl"><thead><tr>'+headers.map(function(h){return '<th>'+h+'</th>';}).join('')+'</tr></thead>'+
+    '<tbody>'+rowsHtml.join('')+'</tbody></table></div>';
+}
+
+/* ============================================================
+   Navigation
+   ============================================================ */
+var NAV = [
+  {group:'Operasional', items:[
+    {page:'dashboard', label:'Ringkasan', icon:'grid'},
+    {page:'batches', label:'Pendaratan', icon:'waves'},
+    {page:'inventory', label:'Inventaris', icon:'box'},
+    {page:'shipments', label:'Pengiriman', icon:'truck'},
+    {page:'logs', label:'Pelacakan suhu', icon:'pin'},
+    {page:'claims', label:'Klaim', icon:'alert'}
+  ]},
+  {group:'Data master', items:[
+    {page:'vessels', label:'Kapal', icon:'anchor'},
+    {page:'buyers', label:'Pembeli', icon:'briefcase'},
+    {page:'coldstorages', label:'Cold storage', icon:'snow'},
+    {page:'users', label:'Pengguna', icon:'users'}
+  ]},
+  {group:'Sistem', items:[
+    {page:'reports', label:'Laporan & data', icon:'doc'},
+    {page:'settings', label:'Pengaturan', icon:'sliders'}
+  ]}
+];
+var PAGE_META = {
+  dashboard:{title:'Ringkasan', desc:'Kondisi rantai dingin & operasional hari ini'},
+  batches:{title:'Pendaratan tangkapan', desc:'Batch hasil tangkapan yang mendarat di PPS Lampulo'},
+  inventory:{title:'Inventaris', desc:'Stok per koli dengan kode QR dan status rantai dingin'},
+  shipments:{title:'Pengiriman', desc:'Instruksi pengiriman dan status perjalanan'},
+  logs:{title:'Pelacakan suhu', desc:'Telemetri suhu & posisi selama pengiriman'},
+  claims:{title:'Klaim', desc:'Pengajuan klaim susut, mutu, kemasan, dan keterlambatan'},
+  vessels:{title:'Kapal', desc:'Data master armada tangkap'},
+  buyers:{title:'Pembeli', desc:'Data master mitra pembeli'},
+  coldstorages:{title:'Cold storage', desc:'Data master fasilitas penyimpanan dingin'},
+  users:{title:'Pengguna', desc:'Staf dan akses peran dalam sistem'},
+  reports:{title:'Laporan & data', desc:'Ringkasan operasional, ekspor, dan impor data'},
+  settings:{title:'Pengaturan', desc:'Sumber data & sambungan Supabase'},
+  'shipment-detail':{title:'Detail pengiriman', desc:''}
+};
+
+function renderNav(){
+  var html = '';
+  var allowed = allowedPages();
+  NAV.forEach(function(g){
+    var items = g.items.filter(function(it){ return allowed.indexOf(it.page)!==-1; });
+    if(!items.length) return;
+    html += '<div class="nav-group-label">'+esc(g.group)+'</div>';
+    items.forEach(function(it){
+      var active = route.page===it.page ? ' active' : '';
+      html += '<button class="nav-item'+active+'" data-nav="'+it.page+'">'+icon(it.icon)+'<span>'+esc(it.label)+'</span></button>';
+    });
+  });
+  return html;
+}
+function renderSidebarFoot(){
+  var el = document.getElementById('sidebar-foot');
+  if(!el) return;
+  if(!currentUser){ el.innerHTML = ''; return; }
+  el.innerHTML =
+    '<div class="sidebar-user-name">'+esc(currentUser.full_name)+'</div>'+
+    '<div class="sidebar-user-role">'+esc(enumLabel('user_role', currentUser.role))+' · '+esc(currentUser.branch_location||'—')+'</div>'+
+    '<button class="btn btn-sm btn-ghost" data-action="logout" style="margin-top:9px;width:100%;justify-content:center;border-color:#204049;color:#BFD6D8">'+icon('close')+'<span>Keluar</span></button>';
+}
+
+function renderTopbar(){
+  var meta = PAGE_META[route.page] || {title:'', desc:''};
+  var title = meta.title, desc = meta.desc;
+  if(route.page==='shipment-detail'){
+    var sh = shipment(route.id);
+    title = sh ? sh.shipment_number : 'Pengiriman';
+    desc = sh ? (buyerName(sh.buyer_id)) : '';
+  }
+  document.getElementById('topbar-title').textContent = title;
+  document.getElementById('topbar-desc').textContent = desc;
+
+  var actions = '';
+  actions += mode==='live'
+    ? '<span class="badge badge-green" title="Tersambung ke Supabase asli">Live</span>'
+    : '<span class="badge badge-grey" title="Data lokal di browser ini">Demo</span>';
+  var searchable = ['batches','inventory','shipments','vessels','buyers','coldstorages','users'];
+  if(searchable.indexOf(route.page) !== -1){
+    actions += '<div class="search-box">'+icon('search')+'<input type="text" id="search-input" placeholder="Cari..." value="'+esc(searchTerm)+'" data-search /></div>';
+  }
+  var addMap = {
+    batches:{action:'open-batch-modal', label:'Tambah batch'},
+    inventory:{action:'open-item-modal', label:'Tambah item'},
+    shipments:{action:'open-shipment-modal', label:'Buat pengiriman'},
+    vessels:{action:'open-vessel-modal', label:'Tambah kapal'},
+    buyers:{action:'open-buyer-modal', label:'Tambah pembeli'},
+    coldstorages:{action:'open-cs-modal', label:'Tambah cold storage'},
+    users:{action:'open-user-modal', label:'Tambah pengguna'},
+    claims:{action:'open-claim-modal', label:'Ajukan klaim'}
+  };
+  var add = addMap[route.page];
+  var manageAddPages = {batches:1, inventory:1, shipments:1, vessels:1, buyers:1, coldstorages:1, users:1};
+  if(add && (!manageAddPages[route.page] || canManage())){
+    actions += '<button class="btn btn-primary" data-action="'+add.action+'">'+icon('plus')+'<span>'+esc(add.label)+'</span></button>';
+  }
+  document.getElementById('topbar-actions').innerHTML = actions;
+}
+
+/* ============================================================
+   Dashboard
+   ============================================================ */
+function renderDashboard(){
+  var inStock = db.inventoryItems.filter(function(it){ return it.status==='in_stock'; });
+  var totalStockTon = inStock.reduce(function(a,it){ return a + Number(it.net_weight_kg||0); }, 0) / 1000;
+  var totalCapacityTon = db.coldStorages.reduce(function(a,cs){ return a + Number(cs.max_capacity_tons||0); }, 0);
+  var pct = totalCapacityTon > 0 ? Math.min(100, (totalStockTon/totalCapacityTon)*100) : 0;
+  var pctTone = pct > 90 ? 'var(--red)' : (pct > 70 ? 'var(--amber)' : 'var(--accent)');
+
+  var thisMonth = new Date().getMonth();
+  var batchesThisMonth = db.catchBatches.filter(function(b){ return new Date(b.landing_date).getMonth()===thisMonth; }).length;
+  var activeShipments = db.shipments.filter(function(s){ return s.status==='loading' || s.status==='in_transit'; }).length;
+  var pendingClaims = db.claims.filter(function(c){ return c.status==='pending'; }).length;
+  var avgTemp = inStock.length ? (inStock.reduce(function(a,it){ return a + Number(it.core_temperature_celsius||0); },0) / inStock.length) : null;
+
+  var recentBatches = db.catchBatches.slice().sort(function(a,b){ return new Date(b.landing_date)-new Date(a.landing_date); }).slice(0,5);
+  var activeShipList = db.shipments.filter(function(s){ return s.status!=='completed' && s.status!=='cancelled'; })
+    .sort(function(a,b){ return new Date(b.departure_time||0)-new Date(a.departure_time||0); }).slice(0,5);
+
+  var html = '';
+  html += '<div class="hero panel-accent">'+
+    '<div class="hero-top"><div><div class="hero-label">Total stok di cold storage saat ini</div>'+
+    '<div class="hero-figure"><span class="hero-num">'+fmtNum(totalStockTon,1)+'</span><span class="hero-unit">ton dari '+fmtNum(totalCapacityTon,0)+' ton kapasitas total</span></div></div>'+
+    '<div class="hero-updated">Diperbarui '+fmtDateTime(nowIso())+'</div></div>'+
+    '<div class="gauge"><div class="gauge-fill" style="width:'+pct.toFixed(1)+'%;background:'+pctTone+'"></div></div>'+
+    '<div class="gauge-caption"><span>0 ton</span><span>'+pct.toFixed(0)+'% terisi</span><span>'+fmtNum(totalCapacityTon,0)+' ton</span></div>'+
+    '</div>';
+
+  html += '<div class="stat-grid">'+
+    '<div class="stat-tile" style="--tone:var(--accent)"><div class="stat-label">Pendaratan bulan ini</div><div class="stat-value">'+batchesThisMonth+'</div><div class="stat-sub">batch tangkapan</div></div>'+
+    '<div class="stat-tile" style="--tone:var(--blue)"><div class="stat-label">Pengiriman aktif</div><div class="stat-value">'+activeShipments+'</div><div class="stat-sub">muat &amp; dalam perjalanan</div></div>'+
+    '<div class="stat-tile" style="--tone:var(--amber)"><div class="stat-label">Klaim menunggu</div><div class="stat-value">'+pendingClaims+'</div><div class="stat-sub">perlu ditinjau</div></div>'+
+    '<div class="stat-tile" style="--tone:var(--green)"><div class="stat-label">Rata-rata suhu inti</div><div class="stat-value">'+(avgTemp!==null?fmtNum(avgTemp,1):'—')+'°C</div><div class="stat-sub">stok di gudang</div></div>'+
+    '</div>';
+
+  html += '<div class="two-col">';
+  html += '<div class="panel"><div class="subhead-row"><div><p class="section-title">Pendaratan terbaru</p><p class="section-desc">5 batch tangkapan paling baru</p></div>'+
+    '<button class="link-btn" data-nav="batches">Lihat semua</button></div><div class="mini-list">';
+  if(!recentBatches.length){ html += '<div class="empty-note">Belum ada batch pendaratan.</div>'; }
+  recentBatches.forEach(function(b){
+    html += '<div class="mini-row"><div class="mini-row-main"><div class="mini-row-title mono">'+esc(b.lot_number)+'</div>'+
+      '<div class="mini-row-sub">'+esc(vesselName(b.vessel_id))+' · '+itemsInBatch(b.id).length+' item</div></div>'+
+      '<div class="mini-row-sub">'+fmtDate(b.landing_date)+'</div></div>';
+  });
+  html += '</div></div>';
+
+  html += '<div class="panel"><div class="subhead-row"><div><p class="section-title">Pengiriman berjalan</p><p class="section-desc">Belum selesai atau dibatalkan</p></div>'+
+    '<button class="link-btn" data-nav="shipments">Lihat semua</button></div><div class="mini-list">';
+  if(!activeShipList.length){ html += '<div class="empty-note">Tidak ada pengiriman berjalan.</div>'; }
+  activeShipList.forEach(function(s){
+    html += '<div class="mini-row"><div class="mini-row-main"><div class="mini-row-title mono">'+esc(s.shipment_number)+'</div>'+
+      '<div class="mini-row-sub">'+esc(buyerName(s.buyer_id))+'</div></div>'+enumBadge('shipment_status', s.status)+'</div>';
+  });
+  html += '</div></div>';
+  html += '</div>';
+
+  return html;
+}
+
+/* ============================================================
+   Vessels
+   ============================================================ */
+function filterList(list, fields){
+  if(!searchTerm) return list;
+  return list.filter(function(it){
+    return fields.some(function(f){
+      var v = f(it);
+      return v && String(v).toLowerCase().indexOf(searchTerm) !== -1;
+    });
+  });
+}
+
+function renderVessels(){
+  var list = filterList(db.vessels, [function(v){return v.vessel_name;}, function(v){return v.registration_number;}, function(v){return v.captain_name;}]);
+  var mgr = canManage();
+  var rows = list.map(function(v){
+    return '<tr><td><div>'+esc(v.vessel_name)+'</div></td>'+
+      '<td class="mono">'+esc(v.registration_number||'—')+'</td>'+
+      '<td>'+esc(v.captain_name||'—')+'</td>'+
+      '<td>'+fmtNum(v.gross_tonnage,0)+' GT</td>'+
+      rowActions('open-vessel-modal','delete-vessel', v.id, mgr)+'</tr>';
+  });
+  return table(['Nama kapal','No. registrasi','Nakhoda','Tonase',''], rows, 'Belum ada kapal terdaftar.');
+}
+
+function renderBuyers(){
+  var list = filterList(db.buyers, [function(b){return b.company_name;}, function(b){return b.contact_person;}, function(b){return b.destination_province;}]);
+  var mgr = canManage();
+  var rows = list.map(function(b){
+    return '<tr><td>'+esc(b.company_name)+'</td>'+
+      '<td>'+esc(b.contact_person||'—')+'</td>'+
+      '<td>'+esc(b.phone_number||'—')+'</td>'+
+      '<td>'+esc(b.destination_province)+'</td>'+
+      rowActions('open-buyer-modal','delete-buyer', b.id, mgr)+'</tr>';
+  });
+  return table(['Perusahaan','Kontak','Telepon','Provinsi tujuan',''], rows, 'Belum ada pembeli terdaftar.');
+}
+
+function renderColdStorages(){
+  var list = filterList(db.coldStorages, [function(c){return c.storage_name;}, function(c){return c.location_city;}]);
+  var mgr = canManage();
+  var rows = list.map(function(c){
+    return '<tr><td>'+esc(c.storage_name)+'</td>'+
+      '<td>'+esc(c.location_city)+'</td>'+
+      '<td>'+fmtNum(c.max_capacity_tons,0)+' ton</td>'+
+      '<td class="mono">'+fmtNum(c.target_temperature_celsius,1)+'°C</td>'+
+      rowActions('open-cs-modal','delete-cs', c.id, mgr)+'</tr>';
+  });
+  return table(['Fasilitas','Kota','Kapasitas maks.','Suhu target',''], rows, 'Belum ada cold storage terdaftar.');
+}
+
+function renderUsers(){
+  var list = filterList(db.users, [function(u){return u.full_name;}, function(u){return u.email;}, function(u){return u.branch_location;}]);
+  var mgr = canManage();
+  var live = mode==='live';
+  var rows = list.map(function(u){
+    var linked = !!u.auth_user_id;
+    var inviteBtn = (live && mgr) ? '<button class="icon-btn" data-action="copy-invite-link" data-id="'+u.id+'" title="Salin tautan undangan">'+icon('copy')+'</button>' : '';
+    var actionsHtml = mgr
+      ? '<div class="cell-actions">'+inviteBtn+
+        '<button class="icon-btn" data-action="open-user-modal" data-id="'+u.id+'" title="Ubah">'+icon('pencil')+'</button>'+
+        '<button class="icon-btn btn-danger" data-action="delete-user" data-id="'+u.id+'" title="Hapus">'+icon('trash')+'</button>'+
+        '</div>'
+      : '';
+    return '<tr><td>'+esc(u.full_name)+'</td>'+
+      '<td>'+esc(u.email)+'</td>'+
+      '<td>'+enumBadge('user_role', u.role)+'</td>'+
+      '<td>'+esc(u.branch_location||'—')+'</td>'+
+      (live ? '<td>'+(linked ? '<span class="badge badge-green">Tertaut</span>' : '<span class="badge badge-grey">Belum daftar</span>')+'</td>' : '')+
+      '<td class="col-right">'+actionsHtml+'</td></tr>';
+  });
+  var cols = live ? ['Nama','Email','Peran','Cabang','Akun',''] : ['Nama','Email','Peran','Cabang',''];
+  return table(cols, rows, 'Belum ada pengguna terdaftar.');
+}
+
+/* ============================================================
+   Catch batches
+   ============================================================ */
+function renderBatches(){
+  var list = filterList(db.catchBatches, [function(b){return b.lot_number;}, function(b){return vesselName(b.vessel_id);}, function(b){return b.landing_port;}]);
+  list = list.slice().sort(function(a,b){ return new Date(b.landing_date)-new Date(a.landing_date); });
+  var mgr = canManage();
+  var rows = list.map(function(b){
+    var count = itemsInBatch(b.id).length;
+    return '<tr><td class="mono">'+esc(b.lot_number)+'</td>'+
+      '<td>'+esc(vesselName(b.vessel_id))+'</td>'+
+      '<td>'+fmtDate(b.landing_date)+'</td>'+
+      '<td>'+esc(b.landing_port)+'<div class="cell-sub">'+esc(b.wpp_zone)+'</div></td>'+
+      '<td>'+esc(userName(b.qc_officer_id))+'</td>'+
+      '<td>'+count+' item</td>'+
+      rowActions('open-batch-modal','delete-batch', b.id, mgr)+'</tr>';
+  });
+  return table(['No. lot','Kapal','Tgl. mendarat','Pelabuhan / zona','Petugas QC','Item',''], rows, 'Belum ada batch pendaratan.');
+}
+
+/* ============================================================
+   Inventory
+   ============================================================ */
+function renderInventory(){
+  var list = filterList(db.inventoryItems, [function(it){return it.qr_code_id;}, function(it){return it.fish_species;}, function(it){return batchLot(it.batch_id);}]);
+  if(invFilter !== 'all'){ list = list.filter(function(it){ return it.status===invFilter; }); }
+
+  var chips = ['all','in_stock','reserved','in_transit','delivered','damaged'].map(function(s){
+    var label = s==='all' ? 'Semua' : enumLabel('product_status', s);
+    var active = invFilter===s ? ' active' : '';
+    return '<button class="chip'+active+'" data-action="filter-inv" data-id="'+s+'">'+esc(label)+'</button>';
+  }).join('');
+
+  var mgr = canManage();
+  var rows = list.map(function(it){
+    return '<tr><td class="mono">'+esc(it.qr_code_id)+'</td>'+
+      '<td>'+esc(it.fish_species)+'<div class="cell-sub">'+esc(enumLabel('processing_type', it.processing_type))+' · Grade '+esc(it.grade)+'</div></td>'+
+      '<td class="mono">'+fmtNum(it.net_weight_kg,1)+' kg</td>'+
+      '<td class="mono">'+fmtNum(it.core_temperature_celsius,1)+'°C</td>'+
+      '<td>'+enumBadge('product_status', it.status)+'</td>'+
+      '<td class="mono">'+esc(batchLot(it.batch_id))+'</td>'+
+      rowActions('open-item-modal','delete-item', it.id, mgr)+'</tr>';
+  });
+  return '<div class="filter-chips">'+chips+'</div>' + table(['Kode QR','Spesies','Berat bersih','Suhu inti','Status','Batch',''], rows, 'Belum ada item inventaris.');
+}
+
+/* ============================================================
+   Shipments (list)
+   ============================================================ */
+function renderShipments(){
+  var list = filterList(db.shipments, [function(s){return s.shipment_number;}, function(s){return buyerName(s.buyer_id);}, function(s){return s.vehicle_plate_number;}]);
+  list = list.slice().sort(function(a,b){ return new Date(b.departure_time||0)-new Date(a.departure_time||0); });
+  var mgr = canManage();
+  var rows = list.map(function(s){
+    return '<tr><td class="mono">'+esc(s.shipment_number)+'</td>'+
+      '<td>'+esc(buyerName(s.buyer_id))+'</td>'+
+      '<td>'+esc(userName(s.driver_id))+'</td>'+
+      '<td>'+esc(enumLabel('transport_type', s.transport_type))+'<div class="cell-sub mono">'+esc(s.vehicle_plate_number||'')+'</div></td>'+
+      '<td>'+enumBadge('shipment_status', s.status)+'</td>'+
+      '<td>'+fmtDate(s.departure_time)+'</td>'+
+      '<td class="col-right"><div class="cell-actions">'+
+      '<button class="btn btn-sm" data-nav="shipment-detail" data-id="'+s.id+'">Detail</button>'+
+      (mgr?'<button class="icon-btn btn-danger" data-action="delete-shipment" data-id="'+s.id+'" title="Hapus">'+icon('trash')+'</button>':'')+
+      '</div></td></tr>';
+  });
+  return table(['No. pengiriman','Pembeli','Sopir','Transportasi','Status','Berangkat',''], rows, 'Belum ada pengiriman.');
+}
+
+/* ============================================================
+   Shipment detail
+   ============================================================ */
+function renderShipmentDetail(){
+  var s = shipment(route.id);
+  if(!s){
+    return '<div class="panel"><p class="empty-note">Pengiriman tidak ditemukan.</p><button class="btn" data-nav="shipments">Kembali ke daftar pengiriman</button></div>';
+  }
+  var loaded = itemsInShipment(s.id);
+  var logs = logsForShipment(s.id);
+  var pod = podForShipment(s.id);
+  var claims = claimsForShipment(s.id);
+  var availableItems = db.inventoryItems.filter(function(it){
+    var alreadyIn = db.shipmentItems.some(function(si){ return si.item_id===it.id; });
+    return !alreadyIn && (it.status==='in_stock' || it.status==='reserved');
+  });
+
+  var html = '<button class="back-link" data-nav="shipments"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg>Kembali ke pengiriman</button>';
+
+  html += '<div class="detail-grid">';
+
+  // left column
+  html += '<div>';
+
+  html += '<div class="panel"><div class="subhead-row"><p class="section-title" style="margin:0">Muatan pengiriman</p>'+
+    '<span class="cell-sub">'+loaded.length+' item</span></div>';
+  var loadRows = loaded.map(function(x){
+    return '<tr><td class="mono">'+esc(x.item.qr_code_id)+'</td><td>'+esc(x.item.fish_species)+'</td>'+
+      '<td class="mono">'+fmtNum(x.item.net_weight_kg,1)+' kg</td>'+
+      '<td class="col-right"><button class="icon-btn btn-danger" data-action="remove-shipment-item" data-id="'+x.link.id+'" title="Keluarkan">'+icon('trash')+'</button></td></tr>';
+  });
+  html += table(['Kode QR','Spesies','Berat',''], loadRows, 'Belum ada item dimuat.');
+  html += '<div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap;align-items:center">'+
+    '<select id="add-item-select" class="field-select" style="border:1px solid var(--border);border-radius:6px;padding:8px 10px;background:var(--surface);color:var(--ink);font-family:var(--font-ui);font-size:13px;flex:1;min-width:180px">'+
+    opts(availableItems, 'id', function(it){ return it.qr_code_id+' — '+it.fish_species+' ('+fmtNum(it.net_weight_kg,1)+' kg)'; }, '', 'Pilih item untuk dimuat')+
+    '</select>'+
+    '<button class="btn btn-sm" data-action="add-shipment-item" data-id="'+s.id+'">'+icon('plus')+'<span>Muat item</span></button>'+
+    '</div></div>';
+
+  html += '<div class="panel"><div class="subhead-row"><p class="section-title" style="margin:0">Pelacakan suhu &amp; posisi</p>'+
+    '<button class="btn btn-sm" data-action="open-log-modal" data-id="'+s.id+'">'+icon('plus')+'<span>Catat titik</span></button></div>';
+  var logRows = logs.map(function(l){
+    return '<tr><td>'+fmtDateTime(l.recorded_at)+'</td>'+
+      '<td class="mono">'+fmtNum(l.storage_temperature_celsius,1)+'°C</td>'+
+      '<td class="mono">'+fmtNum(l.latitude,4)+', '+fmtNum(l.longitude,4)+'</td>'+
+      '<td>'+esc(userName(l.recorded_by))+'</td></tr>';
+  });
+  html += table(['Waktu','Suhu','Koordinat','Dicatat oleh'], logRows, 'Belum ada titik pelacakan.');
+  html += '</div>';
+
+  html += '<div class="panel"><div class="subhead-row"><p class="section-title" style="margin:0">Bukti penerimaan (e-PoD)</p></div>';
+  if(pod){
+    html += '<div class="kv-list">'+
+      '<div class="kv-row"><span class="k">Diterima oleh</span><span class="v">'+esc(pod.recipient_name)+'</span></div>'+
+      '<div class="kv-row"><span class="k">Waktu diterima</span><span class="v">'+fmtDateTime(pod.received_at)+'</span></div>'+
+      '<div class="kv-row"><span class="k">Total koli diterima</span><span class="v mono">'+fmtNum(pod.total_boxes_received,0)+'</span></div>'+
+      '<div class="kv-row"><span class="k">Total berat bersih diterima</span><span class="v mono">'+fmtNum(pod.total_net_weight_received,1)+' kg</span></div>'+
+      '<div class="kv-row"><span class="k">Suhu saat diterima</span><span class="v mono">'+fmtNum(pod.receiving_temperature_celsius,1)+'°C</span></div>'+
+      '</div>';
+  }else{
+    html += '<p class="empty-note">Belum ada bukti penerimaan untuk pengiriman ini.</p>'+
+      '<button class="btn btn-sm" data-action="open-pod-modal" data-id="'+s.id+'">'+icon('plus')+'<span>Catat penerimaan</span></button>';
+  }
+  html += '</div>';
+
+  html += '<div class="panel"><div class="subhead-row"><p class="section-title" style="margin:0">Klaim terkait</p>'+
+    '<button class="btn btn-sm" data-action="open-claim-modal" data-id="'+s.id+'">'+icon('plus')+'<span>Ajukan klaim</span></button></div>';
+  var claimRows = claims.map(function(c){
+    return '<tr><td>'+esc(enumLabel('claim_type', c.claim_type))+'</td>'+
+      '<td class="mono">'+(c.claimed_weight_kg!=null?fmtNum(c.claimed_weight_kg,1)+' kg':'—')+'</td>'+
+      '<td>'+enumBadge('claim_status', c.status)+'</td>'+
+      '<td class="col-right"><div class="cell-actions">'+
+      (c.status==='pending' && canApproveClaims() ? '<button class="icon-btn" data-action="approve-claim" data-id="'+c.id+'" title="Setujui">'+icon('check')+'</button><button class="icon-btn btn-danger" data-action="reject-claim" data-id="'+c.id+'" title="Tolak">'+icon('close')+'</button>' : '')+
+      '</div></td></tr>';
+  });
+  html += table(['Jenis','Berat diklaim','Status',''], claimRows, 'Belum ada klaim untuk pengiriman ini.');
+  html += '</div>';
+
+  html += '</div>'; // end left col
+
+  // right column
+  html += '<div>';
+  html += '<div class="panel"><p class="section-title">Informasi pengiriman</p><div class="kv-list">'+
+    '<div class="kv-row"><span class="k">Status</span><span class="v">'+enumBadge('shipment_status', s.status)+'</span></div>'+
+    '<div class="kv-row"><span class="k">Pembeli</span><span class="v">'+esc(buyerName(s.buyer_id))+'</span></div>'+
+    '<div class="kv-row"><span class="k">Sopir</span><span class="v">'+esc(userName(s.driver_id))+'</span></div>'+
+    '<div class="kv-row"><span class="k">Transportasi</span><span class="v">'+esc(enumLabel('transport_type', s.transport_type))+'</span></div>'+
+    '<div class="kv-row"><span class="k">Plat kendaraan</span><span class="v mono">'+esc(s.vehicle_plate_number||'—')+'</span></div>'+
+    '<div class="kv-row"><span class="k">No. segel</span><span class="v mono">'+esc(s.seal_number||'—')+'</span></div>'+
+    '<div class="kv-row"><span class="k">Sertifikat kesehatan</span><span class="v mono">'+esc(s.health_certificate_number||'—')+'</span></div>'+
+    '<div class="kv-row"><span class="k">Berangkat</span><span class="v">'+fmtDateTime(s.departure_time)+'</span></div>'+
+    '<div class="kv-row"><span class="k">Estimasi tiba</span><span class="v">'+fmtDateTime(s.estimated_arrival)+'</span></div>'+
+    '<div class="kv-row"><span class="k">Tiba aktual</span><span class="v">'+fmtDateTime(s.actual_arrival)+'</span></div>'+
+    '</div>'+
+    (canManage() ? '<div class="form-actions" style="justify-content:flex-start;margin-top:14px;padding-top:12px">'+
+    '<button class="btn btn-sm" data-action="open-shipment-modal" data-id="'+s.id+'">'+icon('pencil')+'<span>Ubah</span></button>'+
+    '</div>' : '')+'</div>';
+  html += '</div>';
+
+  html += '</div>'; // end detail-grid
+  return html;
+}
+
+/* ============================================================
+   Shipment logs (global view)
+   ============================================================ */
+function renderLogsPage(){
+  var list = db.shipmentLogs.slice().sort(function(a,b){ return new Date(b.recorded_at)-new Date(a.recorded_at); });
+  var rows = list.map(function(l){
+    var sh = shipment(l.shipment_id);
+    return '<tr><td>'+fmtDateTime(l.recorded_at)+'</td>'+
+      '<td class="mono">'+(sh?esc(sh.shipment_number):'—')+'</td>'+
+      '<td class="mono">'+fmtNum(l.storage_temperature_celsius,1)+'°C</td>'+
+      '<td class="mono">'+fmtNum(l.latitude,4)+', '+fmtNum(l.longitude,4)+'</td>'+
+      '<td>'+esc(userName(l.recorded_by))+'</td>'+
+      '<td class="col-right">'+(sh?'<button class="link-btn" data-nav="shipment-detail" data-id="'+sh.id+'">Lihat pengiriman</button>':'')+'</td></tr>';
+  });
+  return '<p class="section-desc" style="margin-bottom:12px">Seluruh titik telemetri suhu dan posisi dari semua pengiriman. Tambahkan titik baru dari halaman detail pengiriman.</p>' +
+    table(['Waktu','Pengiriman','Suhu','Koordinat','Dicatat oleh',''], rows, 'Belum ada data pelacakan.');
+}
+
+/* ============================================================
+   Claims (global view)
+   ============================================================ */
+function renderClaims(){
+  var list = db.claims.slice();
+  if(claimFilter !== 'all'){ list = list.filter(function(c){ return c.status===claimFilter; }); }
+  list.sort(function(a,b){ return (a.status==='pending'?0:1) - (b.status==='pending'?0:1); });
+
+  var chips = ['all','pending','approved','rejected'].map(function(s){
+    var label = s==='all' ? 'Semua' : enumLabel('claim_status', s);
+    var active = claimFilter===s ? ' active' : '';
+    return '<button class="chip'+active+'" data-action="filter-claims" data-id="'+s+'">'+esc(label)+'</button>';
+  }).join('');
+
+  var rows = list.map(function(c){
+    var sh = shipment(c.shipment_id);
+    var it = c.item_id ? item(c.item_id) : null;
+    return '<tr><td class="mono">'+(sh?esc(sh.shipment_number):'—')+'</td>'+
+      '<td>'+(it?esc(it.fish_species)+'<div class="cell-sub mono">'+esc(it.qr_code_id)+'</div>':'<span class="cell-sub">Umum / tanpa item</span>')+'</td>'+
+      '<td>'+esc(enumLabel('claim_type', c.claim_type))+'</td>'+
+      '<td class="mono">'+(c.claimed_weight_kg!=null?fmtNum(c.claimed_weight_kg,1)+' kg':'—')+'</td>'+
+      '<td>'+enumBadge('claim_status', c.status)+'</td>'+
+      '<td class="col-right"><div class="cell-actions">'+
+      (c.status==='pending' && canApproveClaims() ? '<button class="icon-btn" data-action="approve-claim" data-id="'+c.id+'" title="Setujui">'+icon('check')+'</button><button class="icon-btn btn-danger" data-action="reject-claim" data-id="'+c.id+'" title="Tolak">'+icon('close')+'</button>' : '')+
+      (sh?'<button class="link-btn" data-nav="shipment-detail" data-id="'+sh.id+'" style="margin-left:4px">Detail</button>':'')+
+      '</div></td></tr>';
+  });
+  return '<div class="filter-chips">'+chips+'</div>' + table(['Pengiriman','Item','Jenis klaim','Berat diklaim','Status',''], rows, 'Belum ada klaim.');
+}
+
+/* ============================================================
+   Reports & data (export / import)
+   ============================================================ */
+var TABLE_LABELS = {
+  users:'Pengguna', vessels:'Kapal', buyers:'Pembeli', coldStorages:'Cold storage',
+  catchBatches:'Pendaratan', inventoryItems:'Inventaris', shipments:'Pengiriman',
+  shipmentItems:'Muatan pengiriman', shipmentLogs:'Log pelacakan', proofOfDeliveries:'Bukti penerimaan',
+  claims:'Klaim'
+};
+var TABLE_COLUMNS = {
+  users:['id','full_name','email','phone_number','role','branch_location'],
+  vessels:['id','vessel_name','registration_number','captain_name','gross_tonnage'],
+  buyers:['id','company_name','contact_person','phone_number','address','destination_province'],
+  coldStorages:['id','storage_name','location_city','max_capacity_tons','target_temperature_celsius'],
+  catchBatches:['id','lot_number','vessel_id','landing_date','landing_port','wpp_zone','qc_officer_id','notes'],
+  inventoryItems:['id','qr_code_id','batch_id','fish_species','processing_type','grade','gross_weight_kg','net_weight_kg','core_temperature_celsius','status'],
+  shipments:['id','shipment_number','buyer_id','driver_id','transport_type','vehicle_plate_number','seal_number','health_certificate_number','departure_time','estimated_arrival','actual_arrival','status'],
+  shipmentItems:['id','shipment_id','item_id'],
+  shipmentLogs:['id','shipment_id','recorded_at','latitude','longitude','storage_temperature_celsius','recorded_by','image_url'],
+  proofOfDeliveries:['id','shipment_id','received_at','recipient_name','digital_signature_url','total_boxes_received','total_net_weight_received','receiving_temperature_celsius'],
+  claims:['id','shipment_id','item_id','claim_type','claimed_weight_kg','description','photo_evidence_url','status','resolved_by']
+};
+
+function csvEscape(v){
+  if(v===null||v===undefined) return '';
+  var s = String(v);
+  if(/[",\r\n]/.test(s)){ s = '"'+s.replace(/"/g,'""')+'"'; }
+  return s;
+}
+function toCSV(rows, columns){
+  var header = columns.join(',');
+  var lines = rows.map(function(r){ return columns.map(function(c){ return csvEscape(r[c]); }).join(','); });
+  return [header].concat(lines).join('\r\n');
+}
+function downloadText(filename, text, mime){
+  var blob = new Blob([text], {type:(mime||'text/plain')+';charset=utf-8'});
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement('a');
+  a.href = url; a.download = filename;
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  setTimeout(function(){ URL.revokeObjectURL(url); }, 1000);
+}
+function parseCSV(text){
+  var rows = [], row = [], field = '', inQuotes = false;
+  for(var i=0;i<text.length;i++){
+    var c = text[i];
+    if(inQuotes){
+      if(c==='"'){ if(text[i+1]==='"'){ field+='"'; i++; } else { inQuotes=false; } }
+      else field += c;
+    } else {
+      if(c==='"') inQuotes = true;
+      else if(c===','){ row.push(field); field=''; }
+      else if(c==='\r'){ /* skip */ }
+      else if(c==='\n'){ row.push(field); rows.push(row); row=[]; field=''; }
+      else field += c;
+    }
+  }
+  if(field.length || row.length){ row.push(field); rows.push(row); }
+  if(!rows.length) return [];
+  var headers = rows[0].map(function(h){ return h.trim(); });
+  return rows.slice(1)
+    .filter(function(r){ return r.some(function(v){ return v && v.trim()!==''; }); })
+    .map(function(r){ var obj={}; headers.forEach(function(h,idx){ obj[h]=r[idx]!==undefined?r[idx]:''; }); return obj; });
+}
+function readFileAsText(file){
+  return new Promise(function(resolve, reject){
+    var reader = new FileReader();
+    reader.onload = function(){ resolve(String(reader.result||'')); };
+    reader.onerror = function(){ reject(reader.error || new Error('Gagal membaca berkas.')); };
+    reader.readAsText(file);
+  });
+}
+
+function exportTableCSV(key){
+  var cols = TABLE_COLUMNS[key];
+  downloadText(key+'.csv', toCSV(db[key], cols), 'text/csv');
+  toast(esc(TABLE_LABELS[key])+' diekspor ke CSV');
+}
+function exportBackup(){
+  var payload = {version:1, exportedAt:nowIso(), mode:mode, data:{}};
+  for(var k in TABLE_LABELS){ payload.data[k] = db[k]; }
+  downloadText('jejak-laut-cadangan-'+new Date().toISOString().slice(0,10)+'.json', JSON.stringify(payload,null,2), 'application/json');
+  toast('Cadangan lengkap diunduh');
+}
+var UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+async function importBackupFile(file){
+  var text = await readFileAsText(file);
+  var parsed;
+  try{ parsed = JSON.parse(text); }catch(e){ throw new Error('Berkas bukan JSON yang valid.'); }
+  if(!parsed || !parsed.data) throw new Error('Format cadangan tidak dikenali.');
+  if(mode==='live'){
+    var allValid = true;
+    for(var k in parsed.data){
+      (parsed.data[k]||[]).forEach(function(row){ if(row.id && !UUID_RE.test(row.id)) allValid=false; });
+    }
+    if(!allValid){
+      throw new Error('Cadangan ini berasal dari mode demo (ID bukan UUID) dan tidak bisa ditulis langsung ke Supabase. Gunakan impor CSV untuk data baru, atau impor cadangan ini saat berada di mode demo.');
+    }
+    var order = ['users','vessels','buyers','coldStorages','catchBatches','inventoryItems','shipments','shipmentItems','shipmentLogs','proofOfDeliveries','claims'];
+    for(var i=0;i<order.length;i++){
+      var key = order[i];
+      var rows = parsed.data[key];
+      if(rows && rows.length){
+        var res = await supaClient.from(SUPA_TABLES[key]).upsert(rows);
+        if(res.error) throw new Error('Gagal mengimpor '+TABLE_LABELS[key]+': '+res.error.message);
+      }
+    }
+    await supaFetchAll();
+  } else {
+    var next = {};
+    for(var k2 in TABLE_LABELS){ next[k2] = parsed.data[k2] || []; }
+    db = next;
+  }
+}
+function downloadTemplate(kind){
+  if(kind==='batches'){
+    downloadText('template_pendaratan.csv',
+      'lot_number,no_registrasi_kapal,tanggal_mendarat,pelabuhan,zona_wpp,email_qc,catatan\r\n'+
+      'LOT-CONTOH-001,BA.1234/ZC,2026-09-20 08:00,PPS Lampulo,WPPNRI 572,fadli.ansari@lampulo.id,Contoh catatan\r\n', 'text/csv');
+  } else {
+    downloadText('template_inventaris.csv',
+      'qr_code_id,lot_number,spesies,jenis_olahan,grade,berat_kotor_kg,berat_bersih_kg,suhu_inti,status\r\n'+
+      'QR-CONTOH-001,LOT-CONTOH-001,Tuna Sirip Kuning,whole,A,100,95,-19,in_stock\r\n', 'text/csv');
+  }
+}
+async function importBatchesCSV(file){
+  var rows = parseCSV(await readFileAsText(file));
+  var okCount=0, errors=[];
+  for(var i=0;i<rows.length;i++){
+    var r = rows[i];
+    if(!r.lot_number){ errors.push('Baris '+(i+2)+': lot_number kosong'); continue; }
+    var vessel_ = db.vessels.find(function(v){ return v.registration_number===r.no_registrasi_kapal; });
+    var qc_ = db.users.find(function(u){ return u.email===r.email_qc; });
+    var payload = {
+      lot_number:r.lot_number, vessel_id: vessel_?vessel_.id:null,
+      landing_date: r.tanggal_mendarat ? (new Date(r.tanggal_mendarat.replace(' ','T')).toISOString()) : nowIso(),
+      landing_port:r.pelabuhan||'PPS Lampulo', wpp_zone:r.zona_wpp||'WPPNRI 572',
+      qc_officer_id: qc_?qc_.id:null, notes:r.catatan||''
+    };
+    try{ await persistInsert('catchBatches', payload, 'cb'); okCount++; }
+    catch(err){ errors.push('Baris '+(i+2)+': '+err.message); }
+  }
+  return {okCount:okCount, errors:errors};
+}
+async function importItemsCSV(file){
+  var rows = parseCSV(await readFileAsText(file));
+  var okCount=0, errors=[];
+  for(var i=0;i<rows.length;i++){
+    var r = rows[i];
+    if(!r.qr_code_id){ errors.push('Baris '+(i+2)+': qr_code_id kosong'); continue; }
+    var batchRow = db.catchBatches.find(function(b){ return b.lot_number===r.lot_number; });
+    if(!batchRow){ errors.push('Baris '+(i+2)+': lot_number "'+r.lot_number+'" tidak ditemukan'); continue; }
+    var payload = {
+      qr_code_id:r.qr_code_id, batch_id:batchRow.id, fish_species:r.spesies||'',
+      processing_type: ENUMS.processing_type[r.jenis_olahan] ? r.jenis_olahan : 'whole',
+      grade:r.grade||'A',
+      gross_weight_kg:Number(r.berat_kotor_kg)||0, net_weight_kg:Number(r.berat_bersih_kg)||0,
+      core_temperature_celsius:Number(r.suhu_inti)||0,
+      status: ENUMS.product_status[r.status] ? r.status : 'in_stock'
+    };
+    try{ await persistInsert('inventoryItems', payload, 'i'); okCount++; }
+    catch(err){ errors.push('Baris '+(i+2)+': '+err.message); }
+  }
+  return {okCount:okCount, errors:errors};
+}
+
+function groupSum(list, keyFn, weightFn){
+  var map = {}, order = [];
+  list.forEach(function(it){
+    var k = keyFn(it);
+    if(!map[k]){ map[k] = {key:k, count:0, total:0}; order.push(k); }
+    map[k].count += 1;
+    map[k].total += Number(weightFn ? weightFn(it) : 0) || 0;
+  });
+  return order.map(function(k){ return map[k]; });
+}
+
+function renderReports(){
+  var html = '';
+
+  if(lastImportReport){
+    var r = lastImportReport;
+    html += '<div class="panel" style="border-left:3px solid '+(r.errors.length?'var(--amber)':'var(--green)')+'">'+
+      '<div class="subhead-row"><p class="section-title" style="margin:0">Hasil impor terakhir</p>'+
+      '<button class="link-btn" data-action="dismiss-import-report">Tutup</button></div>'+
+      '<p class="section-desc" style="margin:0">'+r.okCount+' baris berhasil diimpor'+(r.errors.length?(', '+r.errors.length+' baris gagal:'):'.')+'</p>'+
+      (r.errors.length ? '<ul style="margin:8px 0 0;padding-left:18px;font-size:12.5px;color:var(--muted)">'+r.errors.slice(0,12).map(function(e){return '<li>'+esc(e)+'</li>';}).join('')+'</ul>' : '')+
+      '</div>';
+  }
+
+  // Report: stock by species
+  var bySpecies = groupSum(db.inventoryItems, function(it){ return it.fish_species; }, function(it){ return it.net_weight_kg; });
+  var speciesRows = bySpecies.map(function(g){
+    return '<tr><td>'+esc(g.key)+'</td><td class="mono">'+g.count+'</td><td class="mono">'+fmtNum(g.total,1)+' kg</td></tr>';
+  });
+  html += '<div class="panel"><div class="subhead-row"><div><p class="section-title" style="margin:0">Stok per spesies</p>'+
+    '<p class="section-desc" style="margin:0">Seluruh item inventaris, tanpa memandang status</p></div>'+
+    '<button class="btn btn-sm" data-action="export-report-species">'+icon('download')+'<span>Unduh CSV</span></button></div>'+
+    table(['Spesies','Jumlah item','Total berat bersih'], speciesRows, 'Belum ada data inventaris.')+'</div>';
+
+  // Report: stock by status
+  var byStatus = groupSum(db.inventoryItems, function(it){ return it.status; }, function(it){ return it.net_weight_kg; });
+  var statusRows = byStatus.map(function(g){
+    return '<tr><td>'+enumBadge('product_status', g.key)+'</td><td class="mono">'+g.count+'</td><td class="mono">'+fmtNum(g.total,1)+' kg</td></tr>';
+  });
+  html += '<div class="panel"><div class="subhead-row"><p class="section-title" style="margin:0">Stok per status</p>'+
+    '<button class="btn btn-sm" data-action="export-report-status">'+icon('download')+'<span>Unduh CSV</span></button></div>'+
+    table(['Status','Jumlah item','Total berat bersih'], statusRows, 'Belum ada data inventaris.')+'</div>';
+
+  // Report: shipments by buyer
+  var byBuyer = groupSum(db.shipments, function(s){ return buyerName(s.buyer_id); }, function(s){
+    return itemsInShipment(s.id).reduce(function(a,x){ return a + Number(x.item.net_weight_kg||0); }, 0);
+  });
+  var buyerRows = byBuyer.map(function(g){
+    return '<tr><td>'+esc(g.key)+'</td><td class="mono">'+g.count+'</td><td class="mono">'+fmtNum(g.total,1)+' kg</td></tr>';
+  });
+  html += '<div class="panel"><div class="subhead-row"><p class="section-title" style="margin:0">Pengiriman per pembeli</p>'+
+    '<button class="btn btn-sm" data-action="export-report-buyer">'+icon('download')+'<span>Unduh CSV</span></button></div>'+
+    table(['Pembeli','Jumlah pengiriman','Total berat dimuat'], buyerRows, 'Belum ada pengiriman.')+'</div>';
+
+  // Report: claims by type
+  var byType = groupSum(db.claims, function(c){ return c.claim_type; }, function(c){ return c.claimed_weight_kg; });
+  var typeRows = byType.map(function(g){
+    return '<tr><td>'+esc(enumLabel('claim_type', g.key))+'</td><td class="mono">'+g.count+'</td><td class="mono">'+fmtNum(g.total,1)+' kg</td></tr>';
+  });
+  html += '<div class="panel"><div class="subhead-row"><p class="section-title" style="margin:0">Klaim per jenis</p>'+
+    '<button class="btn btn-sm" data-action="export-report-claimtype">'+icon('download')+'<span>Unduh CSV</span></button></div>'+
+    table(['Jenis klaim','Jumlah','Total berat diklaim'], typeRows, 'Belum ada klaim.')+'</div>';
+
+  // Raw table export
+  var exportRows = Object.keys(TABLE_LABELS).map(function(key){
+    return '<tr><td>'+esc(TABLE_LABELS[key])+'</td><td class="mono">'+db[key].length+' baris</td>'+
+      '<td class="col-right"><button class="btn btn-sm" data-action="export-table-csv" data-id="'+key+'">'+icon('download')+'<span>Unduh CSV</span></button></td></tr>';
+  });
+  html += '<div class="panel"><p class="section-title">Ekspor tabel mentah</p><p class="section-desc">Seluruh kolom apa adanya, sesuai skema database.</p>'+
+    table(['Tabel','Jumlah data',''], exportRows)+'</div>';
+
+  // Full backup
+  html += '<div class="panel"><p class="section-title">Cadangan lengkap</p>'+
+    '<p class="section-desc">Ekspor seluruh data sebagai satu berkas JSON, atau pulihkan dari cadangan sebelumnya.</p>'+
+    '<div style="display:flex;gap:8px;flex-wrap:wrap">'+
+    '<button class="btn" data-action="export-backup">'+icon('download')+'<span>Unduh cadangan (.json)</span></button>'+
+    '<label class="btn" style="cursor:pointer">'+icon('upload')+'<span>Impor cadangan (.json)</span>'+
+    '<input type="file" accept=".json,application/json" data-import="backup" style="display:none"></label>'+
+    '</div></div>';
+
+  // Bulk CSV import
+  html += '<div class="panel"><p class="section-title">Impor massal dari CSV</p>'+
+    '<p class="section-desc">Untuk menambah banyak data pendaratan atau inventaris sekaligus, misalnya hasil rekap harian.</p>'+
+    '<div class="two-col" style="margin-top:10px">'+
+    '<div><p style="font-size:13px;font-weight:500;margin:0 0 6px">Batch pendaratan</p>'+
+    '<div style="display:flex;gap:8px;flex-wrap:wrap">'+
+    '<button class="btn btn-sm" data-action="download-template" data-id="batches">'+icon('download')+'<span>Unduh templat</span></button>'+
+    '<label class="btn btn-sm" style="cursor:pointer">'+icon('upload')+'<span>Impor CSV</span><input type="file" accept=".csv" data-import="batches-csv" style="display:none"></label>'+
+    '</div></div>'+
+    '<div><p style="font-size:13px;font-weight:500;margin:0 0 6px">Item inventaris</p>'+
+    '<div style="display:flex;gap:8px;flex-wrap:wrap">'+
+    '<button class="btn btn-sm" data-action="download-template" data-id="items">'+icon('download')+'<span>Unduh templat</span></button>'+
+    '<label class="btn btn-sm" style="cursor:pointer">'+icon('upload')+'<span>Impor CSV</span><input type="file" accept=".csv" data-import="items-csv" style="display:none"></label>'+
+    '</div></div>'+
+    '</div></div>';
+
+  return html;
+}
+
+function renderSettings(){
+  var cfg = loadSupaConfig();
+  var html = '';
+  html += '<div class="panel panel-accent"><p class="section-title">Status sumber data</p>';
+  if(mode==='live'){
+    html += '<p class="section-desc">Tersambung ke proyek Supabase. Setiap tambah/ubah/hapus langsung ditulis ke database Anda.</p>'+
+      '<div class="kv-list"><div class="kv-row"><span class="k">Project URL</span><span class="v mono">'+esc(cfg?cfg.url:'')+'</span></div></div>'+
+      '<div class="form-actions" style="justify-content:flex-start;margin-top:14px;padding-top:12px">'+
+      '<button class="btn btn-danger" data-action="disconnect-supabase">Putuskan &amp; kembali ke demo</button></div>';
+  } else {
+    html += '<p class="section-desc">Mode demo — data hanya tersimpan di penyimpanan lokal browser ini, belum tersambung ke database sungguhan.</p>';
+  }
+  html += '</div>';
+
+  html += '<div class="panel"><p class="section-title">Sambungkan ke Supabase asli</p>'+
+    '<p class="section-desc">Masukkan Project URL dan anon/public API key dari proyek Supabase Anda (Project Settings &rarr; API). Tabel di proyek tersebut harus sudah mengikuti struktur skema yang diberikan.</p>'+
+    '<form data-form="connect-supabase"><div class="form-grid">'+
+    field('Project URL', '<input type="text" name="url" required placeholder="https://xxxxx.supabase.co" value="'+esc(cfg?cfg.url:'')+'">', true)+
+    field('Anon / public API key', '<input type="text" name="key" required placeholder="eyJhbGciOi...">', true)+
+    '</div>'+
+    '<p class="field-hint" style="margin-top:8px">Kunci anon memang dirancang untuk dipakai di sisi klien — keamanan data diatur lewat Row Level Security (RLS) di Supabase, bukan dengan menyembunyikan kunci ini. Jika RLS aktif tanpa policy, permintaan akan ditolak.</p>'+
+    formActions('Sambungkan')+
+    '</form></div>';
+
+  html += '<div class="panel"><p class="section-title">Tentang mode demo &amp; live</p>'+
+    '<p class="section-desc">Di dalam pratinjau di claude.ai, sambungan keluar ke domain seperti Supabase dapat diblokir oleh sandbox halaman. Untuk pemakaian sungguhan, unduh berkas web ini lalu buka langsung di browser atau letakkan di hosting sendiri — dari situ sambungan ke Supabase berjalan normal karena Supabase memang dirancang untuk dipanggil langsung dari browser.</p></div>';
+
+  return html;
+}
+
+/* ============================================================
+   Page dispatch
+   ============================================================ */
+var PAGES = {
+  dashboard:renderDashboard, vessels:renderVessels, buyers:renderBuyers, coldstorages:renderColdStorages,
+  users:renderUsers, batches:renderBatches, inventory:renderInventory, shipments:renderShipments,
+  'shipment-detail':renderShipmentDetail, logs:renderLogsPage, claims:renderClaims,
+  reports:renderReports, settings:renderSettings
+};
+
+function guardRoute(){
+  if(!currentUser) return;
+  var allowed = allowedPages();
+  var effectivePage = route.page==='shipment-detail' ? 'shipments' : route.page;
+  if(allowed.indexOf(effectivePage)===-1){
+    route = {page: allowed[0] || 'dashboard', id:null};
+  }
+}
+function renderMain(){
+  guardRoute();
+  var fn = PAGES[route.page] || renderDashboard;
+  document.getElementById('main').innerHTML = fn();
+}
+function renderAll(){
+  document.getElementById('sidebar-nav').innerHTML = renderNav();
+  renderSidebarFoot();
+  renderTopbar();
+  renderMain();
+  saveDB();
+}
+
+/* ============================================================
+   Modal helpers
+   ============================================================ */
+function openModal(title, sub, bodyHtml, formType, editId){
+  var root = document.getElementById('modal-root');
+  root.innerHTML =
+    '<div class="modal-backdrop" data-action="backdrop-close">'+
+      '<div class="modal" role="dialog" aria-modal="true">'+
+        '<div class="modal-head"><div><p class="modal-title">'+esc(title)+'</p>'+(sub?'<p class="modal-sub">'+esc(sub)+'</p>':'')+'</div>'+
+        '<button class="modal-close" data-action="close-modal" aria-label="Tutup">'+icon('close')+'</button></div>'+
+        '<form data-form="'+formType+'" data-edit-id="'+(editId||'')+'">'+bodyHtml+'</form>'+
+      '</div>'+
+    '</div>';
+  var firstInput = root.querySelector('input,select,textarea');
+  if(firstInput) setTimeout(function(){ firstInput.focus(); }, 30);
+}
+function closeModal(){ document.getElementById('modal-root').innerHTML = ''; }
+
+function field(label, inputHtml, full){
+  return '<div class="field'+(full?' full':'')+'"><label>'+esc(label)+'</label>'+inputHtml+'</div>';
+}
+function formActions(submitLabel){
+  return '<div class="form-actions"><button type="button" class="btn" data-action="close-modal">Batal</button>'+
+    '<button type="submit" class="btn btn-primary">'+esc(submitLabel||'Simpan')+'</button></div>';
+}
+
+/* ============================================================
+   Layar login & pengalihan tampilan
+   ============================================================ */
+function renderShell(){
+  var authRoot = document.getElementById('auth-root');
+  var appRoot = document.getElementById('app');
+  if(!currentUser){
+    appRoot.style.display = 'none';
+    authRoot.style.display = 'flex';
+    closeModal();
+    renderAuthScreen();
+  } else {
+    authRoot.style.display = 'none';
+    appRoot.style.display = 'flex';
+    renderAll();
+  }
+}
+function authBrandHtml(){
+  return '<div class="auth-brand"><div class="brand-mark">'+
+    '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#EAF7F8" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 15c3 2 6 2 9 0s6-2 9 0"/><path d="M3 19c3 2 6 2 9 0s6-2 9 0"/><path d="M12 3c2 3 2 6 0 9-2-3-2-6 0-9Z"/><path d="M12 12v3"/></svg>'+
+    '</div><div><div class="brand-name" style="color:var(--ink)">Jejak Laut</div><div class="auth-sub">PPS Lampulo · Rantai Dingin</div></div></div>';
+}
+function renderAuthScreen(){
+  var root = document.getElementById('auth-root');
+  var connected = mode==='live';
+  var inner;
+  if(authView==='signup'){
+    inner = authBrandHtml()+
+      '<div class="auth-head-row">'+
+      '<p class="section-title" style="margin:0">Daftar sebagai staf</p>'+
+      (connected ? '<span class="badge badge-green">Live</span>' : '<span class="badge badge-grey">Demo</span>')+
+      '</div>'+
+      (!connected
+        ? '<div class="auth-error">Sambungkan ke proyek Supabase terlebih dahulu untuk bisa mendaftar.</div>'+
+          '<div class="auth-foot" style="margin-top:12px;padding-top:0;border-top:none"><button class="link-btn" data-action="open-connect-modal">Sambungkan ke proyek Supabase…</button></div>'
+        : (authNotice ? '<div class="auth-notice">'+esc(authNotice)+'</div>' : '')+
+          (authError ? '<div class="auth-error">'+esc(authError)+'</div>' : '')+
+          '<form data-form="signup" class="auth-form">'+
+            field('Email', '<input type="email" name="email" required autocomplete="username" value="'+esc(authEmail||'')+'">', true)+
+            field('Kata sandi', '<input type="password" name="password" required autocomplete="new-password" minlength="6">', true)+
+            field('Ulangi kata sandi', '<input type="password" name="confirm_password" required autocomplete="new-password" minlength="6">', true)+
+            '<div class="form-actions" style="justify-content:flex-end;padding-top:0;border-top:none"><button type="submit" class="btn btn-primary">Daftar</button></div>'+
+          '</form>'+
+          '<p class="field-hint" style="margin-top:12px">Gunakan email yang sama dengan yang didaftarkan admin di menu Pengguna, agar akun otomatis tertaut ke profil &amp; peran Anda.</p>')+
+      '<div class="auth-foot"><button class="link-btn" data-action="show-login">Sudah punya akun? Masuk</button></div>';
+  } else {
+    inner = authBrandHtml()+
+      '<div class="auth-head-row">'+
+      '<p class="section-title" style="margin:0">Masuk ke akun Anda</p>'+
+      (connected ? '<span class="badge badge-green">Live</span>' : '<span class="badge badge-grey">Demo</span>')+
+      '</div>'+
+      (authNotice ? '<div class="auth-notice">'+esc(authNotice)+'</div>' : '')+
+      (authError ? '<div class="auth-error">'+esc(authError)+'</div>' : '')+
+      '<form data-form="login" class="auth-form">'+
+        field('Email', '<input type="email" name="email" required autocomplete="username" value="'+esc(authEmail||'')+'">', true)+
+        field('Kata sandi', '<input type="password" name="password" required autocomplete="current-password">', true)+
+        '<div class="form-actions" style="justify-content:flex-end;padding-top:0;border-top:none"><button type="submit" class="btn btn-primary">Masuk</button></div>'+
+      '</form>'+
+      (!connected ? '<p class="field-hint" style="margin-top:12px">Mode demo — gunakan salah satu email pengguna pada data contoh (mis. rina.marlina@lampulo.id) dengan kata sandi <b>demo123</b>.</p>' : '')+
+      '<div class="auth-foot">'+
+      (connected
+        ? '<button class="link-btn" data-action="show-signup">Punya tautan undangan staf? Daftar di sini</button><div style="height:8px"></div><button class="link-btn" data-action="disconnect-supabase">Putuskan sambungan Supabase &amp; kembali ke demo</button>'
+        : '<button class="link-btn" data-action="open-connect-modal">Sambungkan ke proyek Supabase…</button>')+
+      '</div>';
+  }
+  root.innerHTML = '<div class="auth-wrap"><div class="auth-card">'+inner+'</div></div>';
+  var firstInput = root.querySelector('input');
+  if(firstInput) setTimeout(function(){ firstInput.focus(); }, 30);
+}
+function openConnectModal(){
+  var cfg = loadSupaConfig();
+  var body = '<div class="form-grid">'+
+    field('Project URL', '<input type="text" name="url" required placeholder="https://xxxxx.supabase.co" value="'+esc(cfg?cfg.url:'')+'">', true)+
+    field('Anon / public API key', '<input type="text" name="key" required placeholder="eyJhbGciOi...">', true)+
+    '</div>'+
+    '<p class="field-hint" style="margin-top:8px">Setelah tersambung, masuk memakai akun Supabase Auth (email &amp; kata sandi) yang sudah terdaftar di proyek tersebut dan tertaut ke tabel "users".</p>'+
+    formActions('Sambungkan');
+  openModal('Sambungkan ke Supabase', 'Project URL & anon key dari Project Settings → API', body, 'connect-supabase-preauth');
+}
+
+/* ---------- Vessel modal ---------- */
+function openVesselModal(id){
+  var v = id ? vessel(id) : null;
+  var body = '<div class="form-grid">'+
+    field('Nama kapal', '<input type="text" name="vessel_name" required value="'+esc(v?v.vessel_name:'')+'">', true)+
+    field('No. registrasi', '<input type="text" name="registration_number" value="'+esc(v?v.registration_number:'')+'">')+
+    field('Nama nakhoda', '<input type="text" name="captain_name" value="'+esc(v?v.captain_name:'')+'">')+
+    field('Tonase kotor (GT)', '<input type="number" step="1" name="gross_tonnage" value="'+(v?v.gross_tonnage:'')+'">')+
+    '</div>' + formActions();
+  openModal(v?'Ubah kapal':'Tambah kapal', 'Data master armada tangkap', body, 'vessel', id);
+}
+async function saveVessel(data, editId){
+  var payload = {vessel_name:data.vessel_name, registration_number:data.registration_number,
+    captain_name:data.captain_name, gross_tonnage:Number(data.gross_tonnage)||0};
+  if(editId){ await persistUpdate('vessels', editId, payload); toast('Kapal diperbarui'); }
+  else { await persistInsert('vessels', payload, 'v'); toast('Kapal ditambahkan'); }
+}
+
+/* ---------- Buyer modal ---------- */
+function openBuyerModal(id){
+  var b = id ? buyer(id) : null;
+  var body = '<div class="form-grid">'+
+    field('Nama perusahaan', '<input type="text" name="company_name" required value="'+esc(b?b.company_name:'')+'">', true)+
+    field('Kontak person', '<input type="text" name="contact_person" value="'+esc(b?b.contact_person:'')+'">')+
+    field('No. telepon', '<input type="text" name="phone_number" value="'+esc(b?b.phone_number:'')+'">')+
+    field('Provinsi tujuan', '<input type="text" name="destination_province" required value="'+esc(b?b.destination_province:'')+'">')+
+    field('Alamat', '<textarea name="address">'+esc(b?b.address:'')+'</textarea>', true)+
+    '</div>' + formActions();
+  openModal(b?'Ubah pembeli':'Tambah pembeli', 'Data master mitra pembeli', body, 'buyer', id);
+}
+async function saveBuyer(data, editId){
+  var payload = {company_name:data.company_name, contact_person:data.contact_person,
+    phone_number:data.phone_number, destination_province:data.destination_province, address:data.address};
+  if(editId){ await persistUpdate('buyers', editId, payload); toast('Pembeli diperbarui'); }
+  else { await persistInsert('buyers', payload, 'b'); toast('Pembeli ditambahkan'); }
+}
+
+/* ---------- Cold storage modal ---------- */
+function openCsModal(id){
+  var c = id ? byId(db.coldStorages, id) : null;
+  var body = '<div class="form-grid">'+
+    field('Nama fasilitas', '<input type="text" name="storage_name" required value="'+esc(c?c.storage_name:'')+'">', true)+
+    field('Kota', '<input type="text" name="location_city" required value="'+esc(c?c.location_city:'')+'">')+
+    field('Kapasitas maksimum (ton)', '<input type="number" step="0.1" name="max_capacity_tons" value="'+(c?c.max_capacity_tons:'')+'">')+
+    field('Suhu target (°C)', '<input type="number" step="0.1" name="target_temperature_celsius" value="'+(c?c.target_temperature_celsius:-20)+'">')+
+    '</div>' + formActions();
+  openModal(c?'Ubah cold storage':'Tambah cold storage', 'Data master fasilitas penyimpanan dingin', body, 'cs', id);
+}
+async function saveCs(data, editId){
+  var payload = {storage_name:data.storage_name, location_city:data.location_city,
+    max_capacity_tons:Number(data.max_capacity_tons)||0, target_temperature_celsius:Number(data.target_temperature_celsius)||0};
+  if(editId){ await persistUpdate('coldStorages', editId, payload); toast('Cold storage diperbarui'); }
+  else { await persistInsert('coldStorages', payload, 'cs'); toast('Cold storage ditambahkan'); }
+}
+
+/* ---------- User modal ---------- */
+function openUserModal(id){
+  var u = id ? user(id) : null;
+  var body = '<div class="form-grid">'+
+    field('Nama lengkap', '<input type="text" name="full_name" required value="'+esc(u?u.full_name:'')+'">', true)+
+    field('Email', '<input type="email" name="email" required value="'+esc(u?u.email:'')+'">')+
+    field('No. telepon', '<input type="text" name="phone_number" value="'+esc(u?u.phone_number:'')+'">')+
+    field('Peran', '<select name="role">'+enumOptions('user_role', u?u.role:'qc_staff')+'</select>')+
+    field('Lokasi cabang', '<input type="text" name="branch_location" value="'+esc(u?u.branch_location:'Banda Aceh')+'">')+
+    (mode==='demo'
+      ? field('Kata sandi (mode demo)', '<input type="text" name="password" placeholder="'+(u?'Biarkan kosong agar tidak berubah':'default: demo123')+'" value="">')
+      : field('Auth User ID (Supabase Auth)', '<input type="text" name="auth_user_id" placeholder="UUID dari auth.users" value="'+esc(u?u.auth_user_id||'':'')+'">'))+
+    '</div>' +
+    (mode==='live' ? '<p class="field-hint">Simpan dulu profil ini, lalu klik ikon "Salin tautan undangan" pada baris pengguna untuk mengirim tautan pendaftaran mandiri. Kolom Auth User ID ini terisi otomatis setelah orang tersebut mendaftar — isi manual hanya jika akunnya sudah dibuat lebih dulu di Supabase Authentication.</p>' : '') +
+    formActions();
+  openModal(u?'Ubah pengguna':'Tambah pengguna', 'Staf dan akses peran', body, 'user', id);
+}
+async function saveUser(data, editId){
+  var payload = {full_name:data.full_name, email:data.email, phone_number:data.phone_number,
+    role:data.role, branch_location:data.branch_location};
+  if(mode==='demo'){
+    if(data.password){ payload.password = data.password; }
+    else if(!editId){ payload.password = 'demo123'; }
+  } else {
+    payload.auth_user_id = data.auth_user_id ? data.auth_user_id.trim() : null;
+  }
+  if(editId){ await persistUpdate('users', editId, payload); toast('Pengguna diperbarui'); }
+  else { await persistInsert('users', payload, 'u'); toast('Pengguna ditambahkan'); }
+}
+
+/* ---------- Catch batch modal ---------- */
+function openBatchModal(id){
+  var b = id ? batch(id) : null;
+  var body = '<div class="form-grid">'+
+    field('No. lot', '<input type="text" name="lot_number" required value="'+esc(b?b.lot_number:'')+'">')+
+    field('Kapal', '<select name="vessel_id">'+opts(db.vessels,'id',function(v){return v.vessel_name;}, b?b.vessel_id:'')+'</select>')+
+    field('Tanggal & waktu mendarat', '<input type="datetime-local" name="landing_date" required value="'+(b?toLocalInput(b.landing_date):'')+'">')+
+    field('Pelabuhan pendaratan', '<input type="text" name="landing_port" value="'+esc(b?b.landing_port:'PPS Lampulo')+'">')+
+    field('Zona WPP', '<input type="text" name="wpp_zone" value="'+esc(b?b.wpp_zone:'WPPNRI 572')+'">')+
+    field('Petugas QC', '<select name="qc_officer_id">'+opts(db.users.filter(function(u){return u.role==='qc_staff'||u.role==='admin';}),'id',function(u){return u.full_name;}, b?b.qc_officer_id:'')+'</select>')+
+    field('Catatan', '<textarea name="notes">'+esc(b?b.notes:'')+'</textarea>', true)+
+    '</div>' + formActions();
+  openModal(b?'Ubah batch pendaratan':'Tambah batch pendaratan', 'Batch hasil tangkapan dari kapal', body, 'batch', id);
+}
+async function saveBatch(data, editId){
+  var payload = {lot_number:data.lot_number, vessel_id:orNull(data.vessel_id), landing_date:fromLocalInput(data.landing_date) || nowIso(),
+    landing_port:data.landing_port, wpp_zone:data.wpp_zone, qc_officer_id:orNull(data.qc_officer_id), notes:data.notes};
+  if(editId){ await persistUpdate('catchBatches', editId, payload); toast('Batch pendaratan diperbarui'); }
+  else { await persistInsert('catchBatches', payload, 'cb'); toast('Batch pendaratan ditambahkan'); }
+}
+
+/* ---------- Inventory item modal ---------- */
+function openItemModal(id){
+  var it = id ? item(id) : null;
+  var body = '<div class="form-grid">'+
+    field('Kode QR', '<input type="text" name="qr_code_id" required value="'+esc(it?it.qr_code_id:'')+'">')+
+    field('Batch pendaratan', '<select name="batch_id" required>'+opts(db.catchBatches,'id',function(b){return b.lot_number;}, it?it.batch_id:'')+'</select>')+
+    field('Spesies ikan', '<input type="text" name="fish_species" required value="'+esc(it?it.fish_species:'')+'">')+
+    field('Jenis olahan', '<select name="processing_type">'+enumOptions('processing_type', it?it.processing_type:'whole')+'</select>')+
+    field('Grade', '<input type="text" name="grade" value="'+esc(it?it.grade:'A')+'">')+
+    field('Status', '<select name="status">'+enumOptions('product_status', it?it.status:'in_stock')+'</select>')+
+    field('Berat kotor (kg)', '<input type="number" step="0.1" name="gross_weight_kg" required value="'+(it?it.gross_weight_kg:'')+'">')+
+    field('Berat bersih (kg)', '<input type="number" step="0.1" name="net_weight_kg" required value="'+(it?it.net_weight_kg:'')+'">')+
+    field('Suhu inti (°C)', '<input type="number" step="0.1" name="core_temperature_celsius" required value="'+(it?it.core_temperature_celsius:-19)+'">')+
+    '</div>' + formActions();
+  openModal(it?'Ubah item inventaris':'Tambah item inventaris', 'Item per koli dengan kode QR', body, 'item', id);
+}
+async function saveItem(data, editId){
+  var payload = {
+    qr_code_id:data.qr_code_id, batch_id:data.batch_id, fish_species:data.fish_species,
+    processing_type:data.processing_type, grade:data.grade, status:data.status,
+    gross_weight_kg:Number(data.gross_weight_kg)||0, net_weight_kg:Number(data.net_weight_kg)||0,
+    core_temperature_celsius:Number(data.core_temperature_celsius)||0
+  };
+  if(editId){ await persistUpdate('inventoryItems', editId, payload); toast('Item inventaris diperbarui'); }
+  else { await persistInsert('inventoryItems', payload, 'i'); toast('Item inventaris ditambahkan'); }
+}
+
+/* ---------- Shipment modal ---------- */
+function openShipmentModal(id){
+  var s = id ? shipment(id) : null;
+  var body = '<div class="form-grid">'+
+    field('No. pengiriman', '<input type="text" name="shipment_number" required value="'+esc(s?s.shipment_number:'')+'">')+
+    field('Pembeli', '<select name="buyer_id" required>'+opts(db.buyers,'id',function(b){return b.company_name;}, s?s.buyer_id:'')+'</select>')+
+    field('Sopir', '<select name="driver_id">'+opts(db.users.filter(function(u){return u.role==='driver';}),'id',function(u){return u.full_name;}, s?s.driver_id:'')+'</select>')+
+    field('Jenis transportasi', '<select name="transport_type">'+enumOptions('transport_type', s?s.transport_type:'reefer_truck')+'</select>')+
+    field('Plat kendaraan', '<input type="text" name="vehicle_plate_number" value="'+esc(s?s.vehicle_plate_number:'')+'">')+
+    field('No. segel', '<input type="text" name="seal_number" value="'+esc(s?s.seal_number:'')+'">')+
+    field('No. sertifikat kesehatan', '<input type="text" name="health_certificate_number" value="'+esc(s?s.health_certificate_number:'')+'">')+
+    field('Status', '<select name="status">'+enumOptions('shipment_status', s?s.status:'preparing')+'</select>')+
+    field('Waktu berangkat', '<input type="datetime-local" name="departure_time" value="'+(s?toLocalInput(s.departure_time):'')+'">')+
+    field('Estimasi tiba', '<input type="datetime-local" name="estimated_arrival" value="'+(s?toLocalInput(s.estimated_arrival):'')+'">')+
+    field('Tiba aktual', '<input type="datetime-local" name="actual_arrival" value="'+(s?toLocalInput(s.actual_arrival):'')+'">')+
+    '</div>' + formActions();
+  openModal(s?'Ubah pengiriman':'Buat pengiriman baru', 'Instruksi pengiriman / surat jalan', body, 'shipment', id);
+}
+async function saveShipment(data, editId){
+  var payload = {
+    shipment_number:data.shipment_number, buyer_id:data.buyer_id, driver_id:orNull(data.driver_id),
+    transport_type:data.transport_type, vehicle_plate_number:data.vehicle_plate_number,
+    seal_number:data.seal_number, health_certificate_number:data.health_certificate_number, status:data.status,
+    departure_time:fromLocalInput(data.departure_time), estimated_arrival:fromLocalInput(data.estimated_arrival),
+    actual_arrival:fromLocalInput(data.actual_arrival)
+  };
+  if(editId){ await persistUpdate('shipments', editId, payload); toast('Pengiriman diperbarui'); }
+  else { await persistInsert('shipments', payload, 's'); toast('Pengiriman dibuat'); }
+}
+
+/* ---------- Shipment log modal ---------- */
+function openLogModal(shipId){
+  var body = '<div class="form-grid">'+
+    field('Suhu penyimpanan (°C)', '<input type="number" step="0.1" name="storage_temperature_celsius" required value="-19">')+
+    field('Dicatat oleh', '<select name="recorded_by">'+opts(db.users,'id',function(u){return u.full_name;}, '')+'</select>')+
+    field('Lintang (latitude)', '<input type="number" step="0.0001" name="latitude" required value="5.5483">')+
+    field('Bujur (longitude)', '<input type="number" step="0.0001" name="longitude" required value="95.3238">')+
+    '</div>' + formActions('Catat titik');
+  openModal('Catat titik pelacakan', 'Suhu & posisi selama pengiriman', body, 'log', shipId);
+}
+async function saveLog(data, shipId){
+  var payload = {
+    shipment_id:shipId, recorded_at:nowIso(),
+    latitude:Number(data.latitude)||0, longitude:Number(data.longitude)||0,
+    storage_temperature_celsius:Number(data.storage_temperature_celsius)||0,
+    recorded_by:orNull(data.recorded_by), image_url:''
+  };
+  await persistInsert('shipmentLogs', payload, 'lg');
+  toast('Titik pelacakan dicatat');
+}
+
+/* ---------- Proof of delivery modal ---------- */
+function openPodModal(shipId){
+  var suggestedBoxes = itemsInShipment(shipId).length;
+  var suggestedWeight = itemsInShipment(shipId).reduce(function(a,x){ return a + Number(x.item.net_weight_kg||0); }, 0);
+  var body = '<div class="form-grid">'+
+    field('Nama penerima', '<input type="text" name="recipient_name" required>')+
+    field('Waktu diterima', '<input type="datetime-local" name="received_at" required value="'+toLocalInput(nowIso())+'">')+
+    field('Total koli diterima', '<input type="number" step="1" name="total_boxes_received" required value="'+suggestedBoxes+'">')+
+    field('Total berat bersih diterima (kg)', '<input type="number" step="0.1" name="total_net_weight_received" required value="'+suggestedWeight+'">')+
+    field('Suhu saat diterima (°C)', '<input type="number" step="0.1" name="receiving_temperature_celsius" required value="-18">')+
+    '</div>' + formActions('Simpan e-PoD');
+  openModal('Catat bukti penerimaan', 'Proof of Delivery (e-PoD)', body, 'pod', shipId);
+}
+async function savePod(data, shipId){
+  var payload = {
+    shipment_id:shipId, received_at:fromLocalInput(data.received_at) || nowIso(),
+    recipient_name:data.recipient_name, digital_signature_url:'',
+    total_boxes_received:Number(data.total_boxes_received)||0,
+    total_net_weight_received:Number(data.total_net_weight_received)||0,
+    receiving_temperature_celsius:Number(data.receiving_temperature_celsius)||0
+  };
+  await persistInsert('proofOfDeliveries', payload, 'pod');
+  var s = shipment(shipId);
+  if(s && s.status!=='completed'){ await persistUpdate('shipments', shipId, {status:'completed'}); }
+  toast('Bukti penerimaan disimpan');
+}
+
+/* ---------- Claim modal ---------- */
+function openClaimModal(shipId){
+  var s = shipId ? shipment(shipId) : null;
+  var relatedItems = s ? itemsInShipment(shipId).map(function(x){ return x.item; }) : db.inventoryItems;
+  var body = '<div class="form-grid">'+
+    field('Pengiriman', '<select name="shipment_id" required>'+opts(db.shipments,'id',function(x){return x.shipment_number;}, shipId||'')+'</select>', true)+
+    field('Item terkait (opsional)', '<select name="item_id">'+opts(relatedItems,'id',function(it){return it.qr_code_id+' — '+it.fish_species;}, '')+'</select>')+
+    field('Jenis klaim', '<select name="claim_type">'+enumOptions('claim_type', 'weight_shrinkage')+'</select>')+
+    field('Berat diklaim (kg)', '<input type="number" step="0.1" name="claimed_weight_kg">')+
+    field('Deskripsi', '<textarea name="description" required></textarea>', true)+
+    '</div>' + formActions('Ajukan klaim');
+  openModal('Ajukan klaim', 'Susut berat, penurunan mutu, kemasan, atau keterlambatan', body, 'claim', shipId||'');
+}
+async function saveClaim(data){
+  var payload = {
+    shipment_id:data.shipment_id, item_id:orNull(data.item_id),
+    claim_type:data.claim_type, claimed_weight_kg: data.claimed_weight_kg ? Number(data.claimed_weight_kg) : null,
+    description:data.description, photo_evidence_url:'', status:'pending', resolved_by:null
+  };
+  await persistInsert('claims', payload, 'cl');
+  toast('Klaim diajukan');
+}
+
+/* ============================================================
+   Delete helpers
+   ============================================================ */
+function removeById(list, id){
+  var idx = -1;
+  for(var i=0;i<list.length;i++){ if(list[i].id===id){ idx=i; break; } }
+  if(idx>-1) list.splice(idx,1);
+}
+function confirmDelete(label){ return window.confirm('Hapus '+label+'? Tindakan ini tidak dapat dibatalkan.'); }
+
+/* ============================================================
+   Event delegation
+   ============================================================ */
+document.addEventListener('click', async function(e){
+  var navBtn = e.target.closest('[data-nav]');
+  if(navBtn){
+    route = {page:navBtn.getAttribute('data-nav'), id:navBtn.getAttribute('data-id')||null};
+    searchTerm=''; invFilter='all'; claimFilter='all';
+    closeMobileSidebar();
+    renderAll();
+    window.scrollTo(0,0);
+    return;
+  }
+
+  var backdrop = e.target.closest('[data-action="backdrop-close"]');
+  if(backdrop && e.target===backdrop){ closeModal(); return; }
+
+  var act = e.target.closest('[data-action]');
+  if(!act) return;
+  var action = act.getAttribute('data-action');
+  var id = act.getAttribute('data-id');
+
+  switch(action){
+    case 'open-sidebar': document.getElementById('app').classList.add('sidebar-open'); return;
+    case 'close-sidebar': document.getElementById('app').classList.remove('sidebar-open'); return;
+    case 'close-modal': closeModal(); return;
+
+    case 'open-vessel-modal': openVesselModal(id); return;
+    case 'delete-vessel':
+      if(confirmDelete('kapal ini')){
+        try{ await persistDelete('vessels', id); renderAll(); toast('Kapal dihapus'); }
+        catch(err){ toastError(err); }
+      } return;
+
+    case 'open-buyer-modal': openBuyerModal(id); return;
+    case 'delete-buyer':
+      if(confirmDelete('pembeli ini')){
+        try{ await persistDelete('buyers', id); renderAll(); toast('Pembeli dihapus'); }
+        catch(err){ toastError(err); }
+      } return;
+
+    case 'open-cs-modal': openCsModal(id); return;
+    case 'delete-cs':
+      if(confirmDelete('cold storage ini')){
+        try{ await persistDelete('coldStorages', id); renderAll(); toast('Cold storage dihapus'); }
+        catch(err){ toastError(err); }
+      } return;
+
+    case 'open-user-modal': openUserModal(id); return;
+    case 'delete-user':
+      if(confirmDelete('pengguna ini')){
+        try{ await persistDelete('users', id); renderAll(); toast('Pengguna dihapus'); }
+        catch(err){ toastError(err); }
+      } return;
+
+    case 'open-batch-modal': openBatchModal(id); return;
+    case 'delete-batch':
+      if(confirmDelete('batch pendaratan ini')){
+        try{ await persistDelete('catchBatches', id); renderAll(); toast('Batch dihapus'); }
+        catch(err){ toastError(err); }
+      } return;
+
+    case 'open-item-modal': openItemModal(id); return;
+    case 'delete-item':
+      if(confirmDelete('item inventaris ini')){
+        try{ await persistDelete('inventoryItems', id); renderAll(); toast('Item dihapus'); }
+        catch(err){ toastError(err); }
+      } return;
+
+    case 'open-shipment-modal': openShipmentModal(id); return;
+    case 'delete-shipment':
+      if(confirmDelete('pengiriman ini')){
+        try{ await persistDelete('shipments', id); renderAll(); toast('Pengiriman dihapus'); }
+        catch(err){ toastError(err); }
+      } return;
+
+    case 'open-log-modal': openLogModal(id); return;
+    case 'open-pod-modal': openPodModal(id); return;
+    case 'open-claim-modal': openClaimModal(id); return;
+
+    case 'add-shipment-item':
+      var sel = document.getElementById('add-item-select');
+      if(sel && sel.value){
+        try{
+          await persistInsert('shipmentItems', {shipment_id:id, item_id:sel.value}, 'si');
+          var it = item(sel.value);
+          if(it && it.status==='in_stock'){ await persistUpdate('inventoryItems', it.id, {status:'reserved'}); }
+          renderAll();
+          toast('Item dimuat ke pengiriman');
+        }catch(err){ toastError(err); }
+      }
+      return;
+    case 'remove-shipment-item':
+      try{ await persistDelete('shipmentItems', id); renderAll(); toast('Item dikeluarkan dari pengiriman'); }
+      catch(err){ toastError(err); }
+      return;
+
+    case 'approve-claim':
+      try{ await persistUpdate('claims', id, {status:'approved'}); renderAll(); toast('Klaim disetujui'); }
+      catch(err){ toastError(err); }
+      return;
+    case 'reject-claim':
+      try{ await persistUpdate('claims', id, {status:'rejected'}); renderAll(); toast('Klaim ditolak'); }
+      catch(err){ toastError(err); }
+      return;
+
+    case 'filter-inv': invFilter = id; renderMain(); return;
+    case 'filter-claims': claimFilter = id; renderMain(); return;
+
+    case 'export-report-species':
+      downloadText('stok_per_spesies.csv', toCSV(groupSum(db.inventoryItems, function(it){return it.fish_species;}, function(it){return it.net_weight_kg;}).map(function(g){return {spesies:g.key, jumlah_item:g.count, total_berat_bersih_kg:g.total.toFixed(1)};}), ['spesies','jumlah_item','total_berat_bersih_kg']), 'text/csv');
+      return;
+    case 'export-report-status':
+      downloadText('stok_per_status.csv', toCSV(groupSum(db.inventoryItems, function(it){return it.status;}, function(it){return it.net_weight_kg;}).map(function(g){return {status:g.key, jumlah_item:g.count, total_berat_bersih_kg:g.total.toFixed(1)};}), ['status','jumlah_item','total_berat_bersih_kg']), 'text/csv');
+      return;
+    case 'export-report-buyer':
+      downloadText('pengiriman_per_pembeli.csv', toCSV(groupSum(db.shipments, function(s){return buyerName(s.buyer_id);}, function(s){return itemsInShipment(s.id).reduce(function(a,x){return a+Number(x.item.net_weight_kg||0);},0);}).map(function(g){return {pembeli:g.key, jumlah_pengiriman:g.count, total_berat_kg:g.total.toFixed(1)};}), ['pembeli','jumlah_pengiriman','total_berat_kg']), 'text/csv');
+      return;
+    case 'export-report-claimtype':
+      downloadText('klaim_per_jenis.csv', toCSV(groupSum(db.claims, function(c){return c.claim_type;}, function(c){return c.claimed_weight_kg;}).map(function(g){return {jenis_klaim:enumLabel('claim_type',g.key), jumlah:g.count, total_berat_diklaim_kg:g.total.toFixed(1)};}), ['jenis_klaim','jumlah','total_berat_diklaim_kg']), 'text/csv');
+      return;
+    case 'export-table-csv': exportTableCSV(id); return;
+    case 'export-backup': exportBackup(); return;
+    case 'download-template': downloadTemplate(id); return;
+    case 'dismiss-import-report': lastImportReport = null; renderMain(); return;
+
+    case 'disconnect-supabase':
+      disconnectSupabase();
+      renderShell();
+      toast('Kembali ke mode demo');
+      return;
+
+    case 'logout':
+      await doLogout();
+      toast('Berhasil keluar');
+      return;
+    case 'open-connect-modal': openConnectModal(); return;
+
+    case 'show-signup':
+      authView = 'signup'; authError = null; authNotice = null;
+      renderAuthScreen();
+      return;
+    case 'show-login':
+      authView = 'login'; authError = null; authNotice = null;
+      renderAuthScreen();
+      return;
+    case 'copy-invite-link': {
+      var invUser = user(id);
+      if(!invUser){ return; }
+      var link = window.location.origin + window.location.pathname + '#signup=' + encodeURIComponent(invUser.email);
+      copyToClipboard(link);
+      toast('Tautan undangan untuk '+invUser.full_name+' disalin. Kirim via WhatsApp/email.');
+      return;
+    }
+  }
+});
+
+document.addEventListener('submit', async function(e){
+  var form = e.target.closest('form[data-form]');
+  if(!form) return;
+  e.preventDefault();
+  var type = form.getAttribute('data-form');
+  var editId = form.getAttribute('data-edit-id') || '';
+  var data = {};
+  new FormData(form).forEach(function(v,k){ data[k]=v; });
+  var submitBtn = form.querySelector('button[type="submit"]');
+  var originalLabel = submitBtn ? submitBtn.textContent : '';
+  if(submitBtn){ submitBtn.disabled = true; submitBtn.textContent = 'Menyimpan...'; }
+
+  try{
+    switch(type){
+      case 'vessel': await saveVessel(data, editId); break;
+      case 'buyer': await saveBuyer(data, editId); break;
+      case 'cs': await saveCs(data, editId); break;
+      case 'user': await saveUser(data, editId); break;
+      case 'batch': await saveBatch(data, editId); break;
+      case 'item': await saveItem(data, editId); break;
+      case 'shipment': await saveShipment(data, editId); break;
+      case 'log': await saveLog(data, editId); break;
+      case 'pod': await savePod(data, editId); break;
+      case 'claim': await saveClaim(data); break;
+      case 'connect-supabase': await connectSupabase(data.url.trim(), data.key.trim()); toast('Berhasil tersambung ke Supabase'); break;
+      case 'connect-supabase-preauth': connectSupabaseClient(data.url.trim(), data.key.trim()); break;
+      case 'login': await doLogin(data.email.trim(), data.password); break;
+      case 'signup': var signupResult = await doSignup(data.email.trim(), data.password, data.confirm_password); break;
+    }
+    if(type==='login'){
+      authError = null; authEmail = ''; authNotice = null;
+      renderShell();
+    } else if(type==='signup'){
+      authError = null;
+      if(signupResult && signupResult.needsConfirmation){
+        authNotice = 'Pendaftaran berhasil! Cek email Anda untuk konfirmasi (jika diminta), lalu kembali ke sini dan masuk.';
+        authView = 'login'; authEmail = data.email || '';
+        renderAuthScreen();
+        if(submitBtn){ submitBtn.disabled = false; submitBtn.textContent = originalLabel; }
+      } else {
+        authNotice = null; authEmail = '';
+        renderShell();
+      }
+    } else if(type==='connect-supabase-preauth'){
+      closeModal();
+      toast('Tersambung ke Supabase. Silakan masuk dengan akun Anda.');
+      renderAuthScreen();
+    } else {
+      closeModal();
+      renderAll();
+    }
+  }catch(err){
+    if(type==='login' || type==='signup'){
+      authError = (err && err.message) || 'Terjadi kesalahan.';
+      authEmail = data.email || '';
+      renderAuthScreen();
+      if(submitBtn){ submitBtn.disabled = false; submitBtn.textContent = originalLabel; }
+    } else {
+      toastError(err);
+      if(submitBtn){ submitBtn.disabled = false; submitBtn.textContent = originalLabel; }
+    }
+  }
+});
+
+document.addEventListener('change', async function(e){
+  var el = e.target;
+  if(el.matches('[data-import="backup"]')){
+    var f1 = el.files[0]; if(!f1) return;
+    try{ await importBackupFile(f1); renderAll(); toast('Cadangan berhasil diimpor'); }
+    catch(err){ toastError(err); }
+    el.value = '';
+  } else if(el.matches('[data-import="batches-csv"]')){
+    var f2 = el.files[0]; if(!f2) return;
+    try{
+      var r2 = await importBatchesCSV(f2);
+      lastImportReport = r2;
+      renderAll();
+      toast(r2.okCount+' batch berhasil diimpor'+(r2.errors.length?(', '+r2.errors.length+' baris gagal'):''));
+    }catch(err){ toastError(err); }
+    el.value = '';
+  } else if(el.matches('[data-import="items-csv"]')){
+    var f3 = el.files[0]; if(!f3) return;
+    try{
+      var r3 = await importItemsCSV(f3);
+      lastImportReport = r3;
+      renderAll();
+      toast(r3.okCount+' item berhasil diimpor'+(r3.errors.length?(', '+r3.errors.length+' baris gagal'):''));
+    }catch(err){ toastError(err); }
+    el.value = '';
+  }
+});
+
+document.addEventListener('input', function(e){
+  if(e.target.matches('#search-input')){
+    searchTerm = e.target.value.toLowerCase();
+    var pos = e.target.selectionStart;
+    renderMain();
+    var el2 = document.getElementById('search-input');
+    if(el2){ el2.focus(); try{ el2.setSelectionRange(pos,pos); }catch(err){} }
+  }
+});
+
+document.addEventListener('keydown', function(e){
+  if(e.key==='Escape'){ closeModal(); }
+});
+
+function closeMobileSidebar(){ document.getElementById('app').classList.remove('sidebar-open'); }
+
+/* ============================================================
+   Init
+   ============================================================ */
+async function boot(){
+  var savedSupaCfg = loadSupaConfig();
+  if(savedSupaCfg && savedSupaCfg.url && savedSupaCfg.key){
+    try{
+      connectSupabaseClient(savedSupaCfg.url, savedSupaCfg.key);
+      var sres = await supaClient.auth.getSession();
+      var session = sres.data && sres.data.session;
+      if(session && session.user){
+        await supaFetchAll();
+        var profile = findProfileForAuthUser(session.user);
+        if(profile) currentUser = profile;
+      }
+    }catch(err){ toastError(err); }
+  } else {
+    var savedUserId = loadSessionUserId();
+    if(savedUserId){
+      var u = byId(db.users, savedUserId);
+      if(u) currentUser = u;
+    }
+  }
+  if(!currentUser) consumeInviteHash();
+  renderShell();
+}
+boot();
+
+})();
+</script>
+</body>
+</html>
